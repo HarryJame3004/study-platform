@@ -1,0 +1,7 @@
+{
+  "id": "c-programming",
+  "name": "C Programming",
+  "description": "Learning C programming from fundamentals, memory, pointers, and systems programming concepts.",
+  "icon": "code",
+  "color": "green"
+}
