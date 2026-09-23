@@ -1,108 +1,91 @@
-# 🐱 Khoi Study VGU
+# Khoi Study VGU
 
-> A personal AI-powered learning platform for building, organizing, and reviewing university knowledge.
+> Personal learning platform for organizing, reviewing, and growing university knowledge.
 
 <p align="center">
-  <b>Learn → Build Knowledge → Review → Improve</b>
+  <b>Learn · Organize · Review · Improve</b>
 </p>
 
 ---
 
-## ✨ About The Project
+## Overview
 
-**Khoi Study VGU** is a personal learning system designed to turn daily study into a long-term knowledge base.
+Khoi Study VGU is a personal knowledge system that transforms daily learning into a structured digital library.
 
-Instead of storing notes randomly, every subject becomes a structured learning space with:
+Instead of managing scattered notes, each subject is organized into reusable learning content:
 
-- 📖 Lessons
-- 🧠 Summaries
-- 📝 Exercises
-- 🎴 Flashcards
-- 🤖 AI-powered learning assistance
+- Lessons
+- Exercises
+- Flashcards
+- Summaries
+- AI-assisted study tools
 
-The goal:
+The principle:
 
 > Add knowledge, not frontend code.
 
-New lessons should become available by adding content, not rewriting the website.
+New learning content should be added through the repository without rebuilding the entire application.
 
 ---
 
-## 🌐 Live Website
-
-🔗 **Study Platform:**
+## Website
 
 https://khoistudyvgu.netlify.app
 
 ---
 
-## 🚀 Features
+## Features
 
-### 📚 Learning System
+### Learning System
 
 - Subject-based organization
-- Markdown-powered lessons
-- Exercises and flashcards
-- Structured learning history
+- Markdown-driven lessons
+- Exercise and flashcard system
+- Structured knowledge storage
 
-### 🌙 Modern Study Interface
+### Study Interface
 
-- Premium study-focused UI
-- Dark mode
 - Responsive design
-- Search system
-- Reading progress tracking
+- Dark mode
+- Search
+- Reading progress
+- Clean lesson experience
 
-### 🤖 AI Learning Assistant
-
-Powered by AI integration:
+### AI Assistant
 
 - Lesson summarization
 - Key concept extraction
-- Future quiz generation
-- Personal learning support
+- AI-powered learning support
 
-### ⚡ Automatic Deployment
-
-Workflow:
+### Automated Workflow
 
 ```text
-Study Content
-      ↓
-GitHub
-      ↓
+Learning Content
+        ↓
+GitHub Repository
+        ↓
 Netlify Build
-      ↓
+        ↓
 Study Website
 ```
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```text
 study-platform/
 │
-├── subjects/              # Learning knowledge base
-│   ├── computer-architecture/
-│   ├── c-programming/
-│   ├── calculus/
-│   └── ...
-│
-├── website/               # Astro study application
-│
-├── docs/                  # Project documentation
-│
-├── scripts/               # Automation tools
-│
+├── subjects/       Learning content
+├── website/        Astro application
+├── docs/           Documentation
+├── scripts/        Automation tools
 └── README.md
 ```
 
 ---
 
-## 📖 Lesson Structure
-
-Each lesson follows:
+## Lesson Format
 
 ```text
 lesson/
@@ -112,59 +95,49 @@ lesson/
 └── flashcards.md
 ```
 
-A lesson contains:
-
-- Explanation
-- Examples
-- Practice problems
-- Review materials
-- Summary
+Each lesson contains explanations, examples, practice, and review materials.
 
 ---
 
-## 🎓 Current Subjects
+## Current Subjects
 
-- 💻 Computer Architecture
-- 💻 C Programming
-- 📐 Calculus
-- 📐 Algebra
-- ⚖️ Law and Data Protection
-- 💻 Introduction to Programming
+- Computer Architecture
+- C Programming
+- Calculus
+- Algebra
+- Law and Data Protection
+- Introduction to Programming
 
 ---
 
-## 🛠️ Technology
-
-Built with:
+## Technology
 
 - Astro
 - Markdown content system
-- Netlify deployment
-- GitHub workflow
+- GitHub
+- Netlify
 - AI API integration
 
 ---
 
-## 📌 Development Philosophy
-
-This project follows a simple idea:
+## Development Philosophy
 
 ```text
-Learn something
-        ↓
-Save knowledge
-        ↓
-Improve system
-        ↓
-Keep learning
+Learn
+ ↓
+Document
+ ↓
+Review
+ ↓
+Improve
 ```
 
-The platform grows together with the learner.
+A long-term personal learning system built alongside the learner.
 
 ---
 
-## 🐱 Mascot
+## Project Status
 
-A small study companion for a long learning journey.
+Active development.
 
-**Khoi Study VGU — Personal Knowledge System**
+New subjects, lessons, and learning features are continuously added.
