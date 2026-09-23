@@ -1,53 +1,170 @@
-# 📚 Study Platform
+# 🐱 Khoi Study VGU
 
-A personal learning system for organizing knowledge, lessons, exercises, and flashcards in one place.
+> A personal AI-powered learning platform for building, organizing, and reviewing university knowledge.
 
-## Vision
+<p align="center">
+  <b>Learn → Build Knowledge → Review → Improve</b>
+</p>
 
-Study is designed as a long-term personal knowledge platform:
+---
 
-- Store learning content in GitHub
-- Use Codex to build and maintain the website
-- Access everything through a modern study interface
+## ✨ About The Project
 
-## Structure
+**Khoi Study VGU** is a personal learning system designed to turn daily study into a long-term knowledge base.
+
+Instead of storing notes randomly, every subject becomes a structured learning space with:
+
+- 📖 Lessons
+- 🧠 Summaries
+- 📝 Exercises
+- 🎴 Flashcards
+- 🤖 AI-powered learning assistance
+
+The goal:
+
+> Add knowledge, not frontend code.
+
+New lessons should become available by adding content, not rewriting the website.
+
+---
+
+## 🌐 Live Website
+
+🔗 **Study Platform:**
+
+https://khoistudyvgu.netlify.app
+
+---
+
+## 🚀 Features
+
+### 📚 Learning System
+
+- Subject-based organization
+- Markdown-powered lessons
+- Exercises and flashcards
+- Structured learning history
+
+### 🌙 Modern Study Interface
+
+- Premium study-focused UI
+- Dark mode
+- Responsive design
+- Search system
+- Reading progress tracking
+
+### 🤖 AI Learning Assistant
+
+Powered by AI integration:
+
+- Lesson summarization
+- Key concept extraction
+- Future quiz generation
+- Personal learning support
+
+### ⚡ Automatic Deployment
+
+Workflow:
+
+```text
+Study Content
+      ↓
+GitHub
+      ↓
+Netlify Build
+      ↓
+Study Website
+```
+
+---
+
+## 🏗️ Architecture
 
 ```text
 study-platform/
 │
-├── subjects/        # Learning content
+├── subjects/              # Learning knowledge base
+│   ├── computer-architecture/
+│   ├── c-programming/
+│   ├── calculus/
+│   └── ...
 │
-├── website/         # Study web application
+├── website/               # Astro study application
 │
-├── docs/            # Documentation
+├── docs/                  # Project documentation
+│
+├── scripts/               # Automation tools
 │
 └── README.md
 ```
 
-## Subjects
+---
 
-The platform is designed to support multiple subjects:
+## 📖 Lesson Structure
 
-- Computer Architecture
-- C Programming
-- Calculus
-- Linux
-- Operating Systems
-- Algorithms
-- Machine Learning
+Each lesson follows:
 
-## Learning Content
+```text
+lesson/
+│
+├── lesson.md
+├── exercises.md
+└── flashcards.md
+```
 
-Each lesson will contain:
+A lesson contains:
 
-- Lesson explanation
+- Explanation
 - Examples
-- Exercises
-- Flashcards
+- Practice problems
+- Review materials
 - Summary
 
-## Goal
+---
 
-Build a personal learning system where adding knowledge does not require changing the website. New subjects and lessons should be added as content.
+## 🎓 Current Subjects
 
-> Add content, not frontend code.
+- 💻 Computer Architecture
+- 💻 C Programming
+- 📐 Calculus
+- 📐 Algebra
+- ⚖️ Law and Data Protection
+- 💻 Introduction to Programming
+
+---
+
+## 🛠️ Technology
+
+Built with:
+
+- Astro
+- Markdown content system
+- Netlify deployment
+- GitHub workflow
+- AI API integration
+
+---
+
+## 📌 Development Philosophy
+
+This project follows a simple idea:
+
+```text
+Learn something
+        ↓
+Save knowledge
+        ↓
+Improve system
+        ↓
+Keep learning
+```
+
+The platform grows together with the learner.
+
+---
+
+## 🐱 Mascot
+
+A small study companion for a long learning journey.
+
+**Khoi Study VGU — Personal Knowledge System**
