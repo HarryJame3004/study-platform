@@ -1,0 +1,24 @@
+{
+  "name": "study-platform-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0",
+    "build": "astro build",
+    "preview": "astro preview --host 0.0.0.0",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "gray-matter": "^4.0.3",
+    "katex": "^0.16.0",
+    "markdown-it": "^14.1.0",
+    "markdown-it-katex": "^2.0.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.0",
+    "@types/markdown-it": "^14.1.0",
+    "@types/node": "^26.6.2",
+    "typescript": "^5.0.0"
+  }
+}

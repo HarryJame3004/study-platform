@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { getSubjects } from '../../../../lib/content';
+
+export function getStaticPaths() {
+  return getSubjects().flatMap((subject) => subject.lessons.map((lesson) => ({
+    params: { subject: subject.slug, lesson: lesson.slug },
+    props: { subject, lesson },
+  })));
+}
+const { subject, lesson } = Astro.props;
+const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.trim()).map((part: string, index: number) => {
+  const title = part.match(/<h1>(.*?)<\/h1>/)?.[1]?.replace(/<[^>]*>/g, '') ?? 'Lesson';
+  const kind = title.toLowerCase() === 'learning objectives' ? 'objectives' : title.toLowerCase() === 'summary' ? 'summary' : 'standard';
+  const html = part.replace(/<(\/?)h([1-5])>/g, (_match: string, slash: string, level: string) => `<${slash}h${Number(level) + 1}>`);
+  return { title, kind, html, id: `lesson-section-${index + 1}` };
+});
+---
+<BaseLayout title={lesson.title} description={`Study ${lesson.title} in ${subject.name}.`}>
+  <div class="inner-page lesson-page page-enter">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a><span>›</span><a href={`/subjects/${subject.slug}/`}>{subject.name}</a><span>›</span><span>{lesson.title}</span>
+    </nav>
+
+    <header class="lesson-hero">
+      <span class="section-kicker">THE STUDY LIBRARY <span class="kicker-divider">/</span> {subject.name.toUpperCase()}</span>
+      <h1>{lesson.title}<span class="accent-dot">.</span></h1>
+      <p class="lesson-lead">A focused space to read, practice, and make this lesson your own.</p>
+      <div class="lesson-meta"><span class="meta-pill">{lesson.date || 'Undated'}</span><span class="meta-pill">{lesson.exercises.length} exercises</span><span class="meta-pill">{lesson.flashcards.length} flashcards</span></div>
+    </header>
+
+    <div class="lesson-layout">
+      <article id="lesson-content" class="lesson-content" aria-label="Lesson content">
+        {sections.map((section, index) => <section id={section.id} class:list={['reading-section', `reading-${section.kind}`]}>
+          <div class="reading-section-number">{String(index + 1).padStart(2, '0')} / {String(sections.length).padStart(2, '0')}</div>
+          <div class="prose" set:html={section.html} />
+        </section>)}
+      </article>
+      <aside class="lesson-sidebar">
+        <div class="sidebar-panel"><span class="section-kicker">ON THIS PAGE</span>
+          {sections.map((section) => <a href={`#${section.id}`}>{section.title}<span>↗</span></a>)}
+          {lesson.exercises.length > 0 && <a href="#exercises">Exercises <span>↗</span></a>}
+          {lesson.flashcards.length > 0 && <a href="#flashcards">Flashcards <span>↗</span></a>}
+        </div>
+        <div class="reading-tip">✦ <span>Take your time. Understanding grows with each pass.</span></div>
+      </aside>
+    </div>
+
+    {lesson.exercises.length > 0 && <section class="practice-section" id="exercises" aria-labelledby="exercises-heading">
+      <div class="section-heading"><div><span class="section-kicker">PUT IT INTO PRACTICE</span><h2 id="exercises-heading">Exercises</h2></div><span class="section-count">{String(lesson.exercises.length).padStart(2, '0')} questions</span></div>
+      <div class="exercise-grid">{lesson.exercises.map((exercise, index) => <div class="exercise-card">
+        <div class="exercise-top"><span class="exercise-number">{String(index + 1).padStart(2, '0')}</span><span>QUESTION {String(index + 1).padStart(2, '0')}</span></div>
+        <div class="prose exercise-question" set:html={exercise.questionHtml} />
+        {exercise.answerHtml && <div class="answer-disclosure">
+          <button type="button" class="answer-button" aria-expanded="false" aria-controls={`answer-${index}`}><span>Show answer</span><span class="answer-toggle-icon" aria-hidden="true">+</span></button>
+          <div class="answer-reveal" id={`answer-${index}`} aria-hidden="true" inert><div class="answer-reveal-inner"><div class="answer-panel"><span class="answer-label">ANSWER</span><div class="prose answer-content" set:html={exercise.answerHtml} /></div></div></div>
+        </div>}
+      </div>)}</div>
+    </section>}
+
+    {lesson.flashcards.length > 0 && <section class="practice-section flashcards-section" id="flashcards" aria-labelledby="flashcards-heading">
+      <div class="section-heading"><div><span class="section-kicker">REMEMBER WHAT MATTERS</span><h2 id="flashcards-heading">Flashcards</h2></div><span class="section-count">{String(lesson.flashcards.length).padStart(2, '0')} cards</span></div>
+      <p class="section-note">Tap a card to turn it over. Tap again to return to the question.</p>
+      <div class="flashcard-grid">{lesson.flashcards.map((card, index) => <div class="flashcard" role="button" tabindex="0" data-flipped="false" aria-pressed="false" aria-label={`Card ${index + 1}: show answer`}>
+        <div class="flashcard-inner">
+          <div class="flashcard-face flashcard-front" aria-hidden="false"><span class="flashcard-label">CARD {String(index + 1).padStart(2, '0')} <span>FRONT</span></span><div class="prose flashcard-text" set:html={card.frontHtml} /><span class="flashcard-hint">Tap to reveal <span aria-hidden="true">↗</span></span></div>
+          <div class="flashcard-face flashcard-back" aria-hidden="true"><span class="flashcard-label">CARD {String(index + 1).padStart(2, '0')} <span>BACK</span></span><div class="prose flashcard-text" set:html={card.backHtml} /><span class="flashcard-hint">Tap to return <span aria-hidden="true">↶</span></span></div>
+        </div>
+      </div>)}</div>
+    </section>}
+    <a class="back-link" href={`/subjects/${subject.slug}/`}>← Back to {subject.name}</a>
+  </div>
+  <script define:vars={{ url: lesson.url, title: lesson.title, subjectName: subject.name }}>
+    try { localStorage.setItem('study-last-lesson', JSON.stringify({ url, title, subject: subjectName })); } catch {}
+    let scheduled = false;
+    const saveProgress = () => {
+      scheduled = false;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = total <= 0 ? 100 : Math.round(Math.min(100, window.scrollY / total * 100));
+      try { localStorage.setItem(`study-progress:${url}`, String(progress)); } catch {}
+    };
+    window.addEventListener('scroll', () => { if (!scheduled) { scheduled = true; requestAnimationFrame(saveProgress); } }, { passive: true });
+    document.querySelectorAll('.answer-disclosure').forEach((disclosure) => {
+      const button = disclosure.querySelector('.answer-button');
+      const panel = disclosure.querySelector('.answer-reveal');
+      button.addEventListener('click', () => {
+        const open = !disclosure.classList.contains('is-open');
+        disclosure.classList.toggle('is-open', open);
+        button.setAttribute('aria-expanded', String(open));
+        button.querySelector('span').textContent = open ? 'Hide answer' : 'Show answer';
+        panel.setAttribute('aria-hidden', String(!open));
+        panel.inert = !open;
+      });
+    });
+    document.querySelectorAll('.flashcard').forEach((card) => {
+      const flip = () => {
+        const flipped = card.dataset.flipped !== 'true';
+        card.dataset.flipped = String(flipped);
+        card.setAttribute('aria-pressed', String(flipped));
+        card.setAttribute('aria-label', `Card ${[...card.parentElement.children].indexOf(card) + 1}: show ${flipped ? 'question' : 'answer'}`);
+        card.querySelector('.flashcard-front').setAttribute('aria-hidden', String(flipped));
+        card.querySelector('.flashcard-back').setAttribute('aria-hidden', String(!flipped));
+      };
+      card.addEventListener('click', flip);
+      card.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flip(); } });
+    });
+  </script>
+</BaseLayout>

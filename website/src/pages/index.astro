@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SubjectCard from '../components/SubjectCard.astro';
+import { getSubjects } from '../lib/content';
+
+const subjects = getSubjects();
+const recent = subjects.flatMap((subject) => subject.lessons.map((lesson) => ({ ...lesson, subjectName: subject.name })))
+  .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title)).slice(0, 5);
+const firstLesson = recent[0];
+---
+<BaseLayout title="Study">
+  <div class="home-page page-enter">
+    <section class="hero" aria-labelledby="home-title">
+      <div class="hero-copy"><div class="eyebrow"><span class="eyebrow-spark">✦</span> A SPACE TO THINK CLEARLY</div><h1 id="home-title">Your personal<br /><span>learning system<span class="hero-period">.</span></span></h1><p>Keep every subject close, find your next lesson, and make room for the kind of progress that lasts.</p><a class="primary-button" href="#subjects">Explore your subjects <span aria-hidden="true">↗</span></a></div>
+      <div class="hero-art" aria-hidden="true"><div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-tile tile-back"><span>01</span><div class="tile-lines"><i></i><i></i><i></i></div></div><div class="hero-tile tile-front"><div class="tile-top"><span>STUDY NOTES</span><span>✦</span></div><div class="tile-quote">Small steps.<br /><em>Big ideas.</em></div><div class="tile-rule"></div><div class="tile-bottom"><span>LEARN SOMETHING NEW</span><span>↗</span></div></div><div class="hero-dot dot-one"></div><div class="hero-dot dot-two"></div></div>
+    </section>
+
+    <section class="continue-section" aria-labelledby="continue-heading"><div class="section-heading"><div><span class="section-kicker">YOUR JOURNEY</span><h2 id="continue-heading">Continue learning</h2></div><span class="section-assist">One step at a time</span></div>
+      {firstLesson ? <a class="continue-card" id="continue-card" href={firstLesson.url}>
+        <span class="continue-visual" aria-hidden="true"><span class="continue-visual-mark">✦</span><span class="continue-visual-number">01 / ∞</span></span>
+        <span class="continue-copy"><span class="continue-label">CURRENT LESSON <span class="label-divider">/</span> <span id="continue-subject">{firstLesson.subjectName}</span></span><strong id="continue-title">{firstLesson.title}</strong><span class="continue-progress-row"><span id="continue-caption">Ready when you are</span><span id="continue-percent">0%</span></span><span class="progress-track"><span id="continue-progress"></span></span></span>
+        <span class="continue-action" aria-hidden="true">Continue <span>↗</span></span>
+      </a> : <div class="empty-state">Your next lesson will appear here when you add one to a subject.</div>}
+    </section>
+
+    <section id="subjects" class="subjects-section" aria-labelledby="subjects-heading"><div class="section-heading"><div><span class="section-kicker">EXPLORE YOUR LIBRARY</span><h2 id="subjects-heading">Subjects</h2></div><span class="section-count">{String(subjects.length).padStart(2, '0')} subjects</span></div><div class="subject-grid">{subjects.map((subject, index) => <SubjectCard subject={subject} index={index} />)}</div></section>
+
+    <section class="recent-section" aria-labelledby="recent-heading"><div class="section-heading"><div><span class="section-kicker">FRESH PAGES</span><h2 id="recent-heading">Recent lessons</h2></div><span class="section-assist">Keep your momentum</span></div>{recent.length ? <div class="recent-list">{recent.map((lesson, index) => <a class="recent-row" href={lesson.url}><span class="recent-index">{String(index + 1).padStart(2, '0')}</span><span class="recent-main"><strong>{lesson.title}</strong><small>{lesson.subjectName}</small></span><span class="recent-date">{lesson.date || 'Undated'}</span><span class="recent-arrow" aria-hidden="true">↗</span></a>)}</div> : <div class="empty-state">Add a lesson to a subject to see it here.</div>}</section>
+  </div>
+  <script>
+    try {
+      const raw = localStorage.getItem('study-last-lesson');
+      const last = raw && JSON.parse(raw);
+      const card = document.querySelector<HTMLAnchorElement>('#continue-card');
+      if (card && last?.url && last?.title && last?.subject) {
+        card.href = last.url;
+        document.querySelector('#continue-subject')!.textContent = last.subject;
+        document.querySelector('#continue-title')!.textContent = last.title;
+        document.querySelector('#continue-caption')!.textContent = 'Reading progress';
+        const progress = Math.max(0, Math.min(100, Number(localStorage.getItem(`study-progress:${last.url}`)) || 0));
+        document.querySelector('#continue-percent')!.textContent = `${progress}%`;
+        (document.querySelector('#continue-progress') as HTMLElement).style.width = `${progress}%`;
+      }
+    } catch {}
+  </script>
+</BaseLayout>

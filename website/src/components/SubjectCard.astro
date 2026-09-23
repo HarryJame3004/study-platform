@@ -1,0 +1,12 @@
+---
+import type { Subject } from '../lib/content';
+interface Props { subject: Subject; index?: number; }
+const { subject, index = 0 } = Astro.props;
+const colors = ['blue', 'green', 'purple', 'orange', 'red'];
+const color = colors.includes(subject.color) ? subject.color : 'blue';
+---
+<a class="subject-card" href={`/subjects/${subject.slug}/`}>
+  <span class="subject-card-top"><span class={`subject-symbol tone-${color}`}>{subject.name.slice(0, 1)}</span><span class="subject-card-arrow" aria-hidden="true">↗</span></span>
+  <span class="subject-card-body"><span class="card-eyebrow">SUBJECT {String(index + 1).padStart(2, '0')}</span><strong>{subject.name}</strong><span class="subject-description">{subject.description || 'A space for your lessons and notes.'}</span></span>
+  <span class="subject-card-foot"><span class="lesson-count-dot"></span>{subject.lessons.length} {subject.lessons.length === 1 ? 'lesson' : 'lessons'} available</span>
+</a>

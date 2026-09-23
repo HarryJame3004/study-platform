@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getSubjects } from '../../lib/content';
+
+export function getStaticPaths() {
+  return getSubjects().map((subject) => ({ params: { subject: subject.slug }, props: { subject } }));
+}
+const { subject } = Astro.props;
+const colors = ['blue', 'green', 'purple', 'orange', 'red'];
+const color = colors.includes(subject.color) ? subject.color : 'blue';
+function lessonDescription(html: string): string {
+  const paragraph = html.match(/<h1>Lesson<\/h1>\s*<p>([\s\S]*?)<\/p>/i)?.[1] ?? html.match(/<p>([\s\S]*?)<\/p>/)?.[1] ?? '';
+  return paragraph.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+}
+---
+<BaseLayout title={subject.name} description={subject.description}>
+  <div class="inner-page subject-page page-enter">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>{subject.name}</span></nav>
+    <header class="subject-hero"><div class={`subject-hero-icon tone-${color}`}>{subject.name.slice(0, 1)}</div><div><span class="section-kicker">YOUR SUBJECT</span><h1>{subject.name}<span class="accent-dot">.</span></h1><p>{subject.description || 'A space for your lessons, ideas, and practice.'}</p><div class="subject-hero-meta"><span class="meta-dot"></span>{subject.lessons.length} {subject.lessons.length === 1 ? 'lesson' : 'lessons'} in this subject</div></div></header>
+    <section class="subject-lessons" aria-labelledby="lessons-heading"><div class="section-heading"><div><span class="section-kicker">YOUR LEARNING PATH</span><h2 id="lessons-heading">Lessons</h2></div><span class="section-count">{String(subject.lessons.length).padStart(2, '0')} available</span></div>
+      {subject.lessons.length ? <div class="subject-lesson-list">{subject.lessons.map((lesson, index) => <a class="subject-lesson-card" href={lesson.url}><span class="lesson-card-index">{String(index + 1).padStart(2, '0')}</span><span class="lesson-card-content"><span class="lesson-card-date">{lesson.date || 'Undated'} <span>·</span> LESSON {String(index + 1).padStart(2, '0')}</span><strong>{lesson.title}</strong><span class="lesson-card-description">{lessonDescription(lesson.html) || 'Open this lesson to explore the concepts, examples, and practice.'}</span><span class="lesson-card-stats">{lesson.exercises.length} exercises <span>·</span> {lesson.flashcards.length} flashcards</span></span><span class="lesson-card-action">Continue <span aria-hidden="true">↗</span></span></a>)}</div> : <div class="empty-state">No lessons yet. Add a folder with <code>lesson.md</code> under this subject’s <code>lessons/</code> directory.</div>}
+    </section>
+  </div>
+</BaseLayout>

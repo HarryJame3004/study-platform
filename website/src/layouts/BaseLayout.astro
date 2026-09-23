@@ -1,0 +1,71 @@
+---
+import '../styles/global.css';
+import 'katex/dist/katex.min.css';
+import { getSubjects } from '../lib/content';
+
+interface Props { title: string; description?: string; }
+const { title, description = 'Your personal learning system.' } = Astro.props;
+const subjects = getSubjects();
+const searchable = subjects.flatMap((subject) => [
+  { title: subject.name, detail: 'Subject', url: `/subjects/${subject.slug}/` },
+  ...subject.lessons.map((lesson) => ({ title: lesson.title, detail: subject.name, url: lesson.url })),
+]);
+const onHome = Astro.url.pathname === '/';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f6f7fb" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      try { document.documentElement.dataset.theme = localStorage.getItem('study-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch {}
+    </script>
+    <title>{title === 'Study' ? title : `${title} · Study`}</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="app-sidebar" aria-label="Main navigation">
+        <a class="brand" href="/" aria-label="Study home"><span class="brand-mark">S</span><span>study<span class="brand-period">.</span></span></a>
+        <div class="sidebar-group-label">WORKSPACE</div>
+        <nav class="sidebar-nav" aria-label="Primary">
+          <a class:list={['nav-item', { active: onHome }]} href="/" aria-current={onHome ? 'page' : undefined}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+          <a class:list={['nav-item', { active: !onHome }]} href="/#subjects" aria-current={!onHome ? 'page' : undefined}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zm0 0V19a2.5 2.5 0 0 1 2.5-2.5H20M8 7h8"/></svg>Subjects</a>
+          <button class="nav-item search-trigger" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>Search <span class="search-key">⌘ K</span></button>
+        </nav>
+        <div class="sidebar-bottom"><div class="sidebar-note"><span class="sidebar-note-icon">✦</span><strong>Stay curious.</strong><p>A little progress every day adds up.</p></div><button class="theme-toggle" type="button" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.7A8.6 8.6 0 0 1 8.3 3.8 8.6 8.6 0 1 0 20.2 15.7Z"/></svg><span>Appearance</span><span class="theme-toggle-trail">↗</span></button></div>
+      </aside>
+
+      <div class="app-main">
+        <header class="topbar"><div class="topbar-title">{onHome ? 'Overview' : 'Your library'} <span class="topbar-dot">/</span> <span class="topbar-muted">Study space</span></div><div class="topbar-actions"><button class="topbar-search search-trigger" type="button" aria-label="Search subjects and lessons"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span>Search anything...</span><kbd>⌘ K</kbd></button><span class="topbar-avatar" aria-hidden="true">S</span></div></header>
+        <main id="main-content"><slot /></main>
+        <footer class="site-footer"><span>Keep learning, one page at a time.</span><span>Study · {new Date().getFullYear()}</span></footer>
+      </div>
+
+      <nav class="mobile-nav" aria-label="Mobile navigation"><a class:list={[{ active: onHome }]} href="/" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a><a class:list={[{ active: !onHome }]} href="/#subjects" aria-label="Subjects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zm0 0V19a2.5 2.5 0 0 1 2.5-2.5H20M8 7h8"/></svg><span>Subjects</span></a><button class="search-trigger" type="button" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span>Search</span></button><button class="theme-toggle" type="button" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.7A8.6 8.6 0 0 1 8.3 3.8 8.6 8.6 0 1 0 20.2 15.7Z"/></svg><span>Theme</span></button></nav>
+    </div>
+
+    <dialog class="search-dialog" aria-label="Search subjects and lessons"><div class="search-dialog-top"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="site-search" type="search" placeholder="Search subjects and lessons" autocomplete="off" aria-label="Search subjects and lessons" /><button class="search-close" type="button" aria-label="Close search">Esc</button></div><div class="search-results">{searchable.map((item) => <a href={item.url} data-search={`${item.title} ${item.detail}`.toLowerCase()}><span><strong>{item.title}</strong><small>{item.detail}</small></span><span aria-hidden="true">↗</span></a>)}</div><p class="search-empty" hidden>No matching subjects or lessons.</p></dialog>
+    <script>
+      document.querySelectorAll<HTMLButtonElement>('.theme-toggle').forEach((button) => button.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem('study-theme', next); } catch {}
+      }));
+      const dialog = document.querySelector<HTMLDialogElement>('.search-dialog');
+      const input = document.querySelector<HTMLInputElement>('#site-search');
+      const results = [...document.querySelectorAll<HTMLAnchorElement>('.search-results a')];
+      document.querySelectorAll<HTMLButtonElement>('.search-trigger').forEach((button) => button.addEventListener('click', () => { dialog?.showModal(); input?.focus(); }));
+      document.querySelector('.search-close')?.addEventListener('click', () => dialog?.close());
+      dialog?.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+      document.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); dialog?.showModal(); input?.focus(); } });
+      input?.addEventListener('input', () => {
+        const query = input.value.trim().toLowerCase(); let visible = 0;
+        results.forEach((result) => { const match = result.dataset.search?.includes(query) ?? false; result.hidden = !match; if (match) visible++; });
+        const empty = document.querySelector<HTMLElement>('.search-empty'); if (empty) empty.hidden = visible > 0;
+      });
+    </script>
+  </body>
+</html>
