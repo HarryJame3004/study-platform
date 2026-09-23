@@ -99,3 +99,37 @@ Run `~/study-platform/scripts/install-up.sh` in a normal user terminal. The inst
 - The installer created an executable `up` command in a temporary home directory.
 - With Git mocked to prevent a real commit and push, running `up` from `/home/khoi` printed `Nothing to update` for a clean status. Running it from `/home/khoi/Downloads` used the expected add, commit, and push sequence and printed success. Every Git call ran from `/home/khoi/study-platform`.
 - Installing to the actual `/home/khoi/.local/bin/up` was rejected because that directory is read-only in this workspace sandbox. Actual global invocation and live Git push remain unverified until installation is run in a normal user terminal.
+
+# Phase 6.1 Fix — Gemini AI Summary Function
+
+## Changes
+
+- Added `website/netlify/functions/ai-summary.js`. It reads `GEMINI_API_KEY` from the function environment, accepts POST requests with lesson text, asks Gemini 2.5 Flash for structured JSON, validates the result, and returns `summary`, `keyPoints`, and `importantConcepts`.
+- Added an **✨ AI Summary** button and a summary card to lesson pages. The browser sends the visible lesson text to `/.netlify/functions/ai-summary` and renders returned text safely, with loading and error states.
+- Styled the card for desktop, mobile, and the existing light/dark themes. Updated the website README with setup and local testing notes.
+- Left `subjects/`, the lesson format, lesson routes, and Netlify's static site deployment settings unchanged.
+
+## Verification
+
+- `npm run check` — passed with 0 errors, 0 warnings, and 0 hints.
+- `npm run build` — passed; 4 static pages generated.
+- Direct function checks with a mocked Gemini request passed for method validation, empty and oversized input, missing key, expected request and response shape, and upstream failure.
+- Inspected the generated lesson HTML: it includes the button, card, and function URL, with no API key embedded.
+- Live Gemini and deployed Netlify Function calls were not run in this environment because no API key or Netlify deployment is available here.
+
+# Phase 6.2 — Cat Branding Update
+
+## Changes
+
+- Used the available `website/public/cat-logo.jpg` as the mascot source. The requested `cat-logo.png.jpg` filename was not present in the workspace.
+- Replaced the generic S branding marks in the sidebar and top bar with the cat, and changed visible brand text to **Khoi Study VGU**.
+- Replaced the old SVG favicon with cat-based 16 px and 32 px PNG favicons and a 180 px Apple touch icon.
+- Updated the 1200 × 630 Open Graph image to feature the cat and Khoi Study VGU branding. Updated page titles, Open Graph site name, and image alt text to match.
+- Updated the website README. AI Summary, `subjects/`, lesson structure, and deployment settings remain unchanged.
+
+## Verification
+
+- `npm run check` — passed with 0 errors, 0 warnings, and 0 hints.
+- `npm run build` — passed; 4 static pages generated.
+- Inspected the cat source and generated social image visually. Confirmed generated image dimensions: favicon 16 × 16 and 32 × 32, touch icon 180 × 180, and Open Graph image 1200 × 630.
+- Checked built home and lesson HTML for cat branding, valid icon links, and the Open Graph image. The lesson still includes the AI Summary button.

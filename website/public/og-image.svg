@@ -1,17 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
-    <linearGradient id="background" x2="1" y2="1">
-      <stop stop-color="#f7f8ff"/>
-      <stop offset="1" stop-color="#e8edff"/>
-    </linearGradient>
+    <linearGradient id="background" x2="1" y2="1"><stop stop-color="#f7f8ff"/><stop offset="1" stop-color="#e8edff"/></linearGradient>
+    <clipPath id="photo-clip"><rect x="785" y="60" width="355" height="510" rx="28"/></clipPath>
   </defs>
   <rect width="1200" height="630" fill="url(#background)"/>
-  <circle cx="1060" cy="120" r="230" fill="#d9ddff" opacity=".65"/>
-  <circle cx="1080" cy="560" r="210" fill="#dceef6" opacity=".8"/>
-  <rect x="84" y="76" width="74" height="74" rx="20" fill="#5c60d9"/>
-  <text x="121" y="129" fill="#fff" font-family="DejaVu Sans, sans-serif" font-size="48" font-weight="700" text-anchor="middle">S</text>
-  <text x="178" y="129" fill="#25294b" font-family="DejaVu Sans, sans-serif" font-size="48" font-weight="700">study.</text>
-  <text x="84" y="311" fill="#25294b" font-family="DejaVu Sans, sans-serif" font-size="72" font-weight="700">Your personal</text>
-  <text x="84" y="402" fill="#5c60d9" font-family="DejaVu Sans, sans-serif" font-size="72" font-weight="700">learning system.</text>
-  <text x="88" y="483" fill="#5b6380" font-family="DejaVu Sans, sans-serif" font-size="28">Subjects, lessons, and practice in one place.</text>
+  <circle cx="1050" cy="110" r="260" fill="#d9ddff" opacity=".6"/>
+  <image x="785" y="60" width="355" height="510" preserveAspectRatio="xMidYMid slice" xlink:href="cat-logo.jpg" clip-path="url(#photo-clip)"/>
+  <text x="80" y="140" fill="#25294b" font-family="DejaVu Sans, sans-serif" font-size="52" font-weight="700">Khoi Study</text>
+  <text x="80" y="205" fill="#5c60d9" font-family="DejaVu Sans, sans-serif" font-size="48" font-weight="700">VGU</text>
+  <text x="80" y="345" fill="#25294b" font-family="DejaVu Sans, sans-serif" font-size="55" font-weight="700">Your personal</text>
+  <text x="80" y="420" fill="#25294b" font-family="DejaVu Sans, sans-serif" font-size="55" font-weight="700">learning system.</text>
+  <text x="84" y="495" fill="#5b6380" font-family="DejaVu Sans, sans-serif" font-size="24">Subjects, lessons, and practice in one place.</text>
 </svg>

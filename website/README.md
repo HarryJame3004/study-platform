@@ -64,16 +64,18 @@ Markdown supports code blocks, tables, and KaTeX math with `$...$` and `$$...$$`
 
 The desktop sidebar and mobile bottom bar link to Home, Subjects, and Search. Search opens a small in-page dialog listing subjects and lessons; use **Ctrl/⌘ K** to open it from a keyboard. It works entirely with the content generated at build time.
 
-The lesson page separates the existing Markdown headings into readable sections and highlights Learning Objectives and Summary. Exercise answers expand with a button. Flashcards flip on click, Enter, or Space. The light/dark switch saves its choice in browser storage. Continue Learning shows the last opened lesson and its approximate reading progress, also saved only in that browser. Clearing browser storage resets both preferences and progress.
+The lesson page separates the existing Markdown headings into readable sections and highlights Learning Objectives and Summary. Exercise answers expand with a button. Flashcards flip on click, Enter, or Space. The **✨ AI Summary** button sends the visible lesson text to a Netlify Function and displays a summary, key points, and important concepts. The light/dark switch saves its choice in browser storage. Continue Learning shows the last opened lesson and its approximate reading progress, also saved only in that browser. Clearing browser storage resets both preferences and progress.
 
 The interface uses system fonts and no additional UI dependency. Layouts adapt for phone, tablet, and laptop widths; reduced-motion settings shorten animations.
 
 ## Deploy to Netlify
 
-Connect the repository and set **Base directory** to `website`, **Build command** to `npm run build`, and **Publish directory** to `dist`. No adapter or server is needed. Netlify must check out the whole repository so the build can read `../subjects/`.
+Connect the repository and set **Base directory** to `website`, **Build command** to `npm run build`, and **Publish directory** to `dist`. No Astro adapter is needed. Netlify must check out the whole repository so the build can read `../subjects/`. Netlify discovers `netlify/functions/ai-summary.js` under the same base directory and exposes it at `/.netlify/functions/ai-summary`.
+
+For AI summaries, set `GEMINI_API_KEY` in Netlify's environment variables with access for Functions, then redeploy. The key is read only by the function and is never included in the browser build. A normal `npm run dev` or `npm run preview` serves the static site without Netlify Functions; use Netlify Dev or the deployed site to exercise the AI Summary button. The function accepts POST requests with JSON `{ "content": "lesson text" }` and returns `summary`, `keyPoints`, and `importantConcepts`.
 
 ## SEO and site URL
 
-Each page has a title, description, canonical URL, and Open Graph metadata. The build creates `robots.txt` and `sitemap.xml` from the same subjects and lessons used for the pages. The SVG favicon has PNG and Apple touch icon versions, and social previews use `og-image.png`.
+Each page has a title, description, canonical URL, and Open Graph metadata. The build creates `robots.txt` and `sitemap.xml` from the same subjects and lessons used for the pages. The cat mascot in `public/cat-logo.jpg` is used for the site branding, PNG favicons, Apple touch icon, and `og-image.png` social preview.
 
 Set `SITE_URL` to the public site origin (for example, `https://study.example.com`) when using a custom domain. Otherwise, Netlify's `URL` build environment variable supplies the origin. Local builds use `http://localhost:4321` so previews and checks can run without deployment settings. Rebuild after changing the origin so canonical links, Open Graph URLs, robots.txt, and sitemap.xml use the new URL.

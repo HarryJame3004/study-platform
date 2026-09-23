@@ -5,8 +5,8 @@ import { getSubjects } from '../lib/content';
 
 interface Props { title: string; description?: string; type?: 'website' | 'article'; }
 const { title, description, type = 'website' } = Astro.props;
-const pageTitle = title === 'Study' ? 'Study | Your personal learning system' : `${title} | Study`;
-const pageDescription = description?.trim() || 'Explore subjects, read lessons, and practice what you learn with Study.';
+const pageTitle = title === 'Study' ? 'Khoi Study VGU | Your personal learning system' : `${title} | Khoi Study VGU`;
+const pageDescription = description?.trim() || 'Explore subjects, read lessons, and practice what you learn with Khoi Study VGU.';
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
 const socialImage = new URL('/og-image.png', canonical);
 const subjects = getSubjects();
@@ -24,17 +24,17 @@ const onHome = Astro.url.pathname === '/';
     <meta name="description" content={pageDescription} />
     <link rel="canonical" href={canonical.href} />
     <meta property="og:type" content={type} />
-    <meta property="og:site_name" content="Study" />
+    <meta property="og:site_name" content="Khoi Study VGU" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={socialImage.href} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Study — your personal learning system" />
+    <meta property="og:image:alt" content="Khoi Study VGU with the cat mascot" />
     <meta name="theme-color" content="#f6f7fb" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <script is:inline>
       try { document.documentElement.dataset.theme = localStorage.getItem('study-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch {}
@@ -44,7 +44,7 @@ const onHome = Astro.url.pathname === '/';
   <body>
     <div class="app-shell">
       <aside class="app-sidebar" aria-label="Main navigation">
-        <a class="brand" href="/" aria-label="Study home"><span class="brand-mark">S</span><span>study<span class="brand-period">.</span></span></a>
+        <a class="brand" href="/" aria-label="Khoi Study VGU home"><span class="brand-mark"><img src="/apple-touch-icon.png" alt="" /></span><span class="brand-name"><strong>Khoi Study</strong><small>VGU</small></span></a>
         <div class="sidebar-group-label">WORKSPACE</div>
         <nav class="sidebar-nav" aria-label="Primary">
           <a class:list={['nav-item', { active: onHome }]} href="/" aria-current={onHome ? 'page' : undefined}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Home</a>
@@ -55,9 +55,9 @@ const onHome = Astro.url.pathname === '/';
       </aside>
 
       <div class="app-main">
-        <header class="topbar"><div class="topbar-title">{onHome ? 'Overview' : 'Your library'} <span class="topbar-dot">/</span> <span class="topbar-muted">Study space</span></div><div class="topbar-actions"><button class="topbar-search search-trigger" type="button" aria-label="Search subjects and lessons"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span>Search anything...</span><kbd>⌘ K</kbd></button><span class="topbar-avatar" aria-hidden="true">S</span></div></header>
+        <header class="topbar"><div class="topbar-title">{onHome ? 'Overview' : 'Your library'} <span class="topbar-dot">/</span> <span class="topbar-muted">Khoi Study VGU</span></div><div class="topbar-actions"><button class="topbar-search search-trigger" type="button" aria-label="Search subjects and lessons"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span>Search anything...</span><kbd>⌘ K</kbd></button><span class="topbar-avatar" aria-hidden="true"><img src="/apple-touch-icon.png" alt="" /></span></div></header>
         <main id="main-content"><slot /></main>
-        <footer class="site-footer"><span>Keep learning, one page at a time.</span><span>Study · {new Date().getFullYear()}</span></footer>
+        <footer class="site-footer"><span>Keep learning, one page at a time.</span><span>Khoi Study VGU · {new Date().getFullYear()}</span></footer>
       </div>
 
       <nav class="mobile-nav" aria-label="Mobile navigation"><a class:list={[{ active: onHome }]} href="/" aria-label="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a><a class:list={[{ active: !onHome }]} href="/#subjects" aria-label="Subjects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zm0 0V19a2.5 2.5 0 0 1 2.5-2.5H20M8 7h8"/></svg><span>Subjects</span></a><button class="search-trigger" type="button" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><span>Search</span></button><button class="theme-toggle" type="button" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.7A8.6 8.6 0 0 1 8.3 3.8 8.6 8.6 0 1 0 20.2 15.7Z"/></svg><span>Theme</span></button></nav>

@@ -27,7 +27,21 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
       <h1>{lesson.title}<span class="accent-dot">.</span></h1>
       <p class="lesson-lead">A focused space to read, practice, and make this lesson your own.</p>
       <div class="lesson-meta"><span class="meta-pill">{lesson.date || 'Undated'}</span><span class="meta-pill">{lesson.exercises.length} exercises</span><span class="meta-pill">{lesson.flashcards.length} flashcards</span></div>
+      <div class="ai-summary-action"><button id="ai-summary-button" type="button" aria-controls="ai-summary-card" aria-expanded="false">✨ AI Summary</button><span>Generate a quick recap of this lesson.</span></div>
     </header>
+
+    <section id="ai-summary-card" class="ai-summary-card" aria-labelledby="ai-summary-title" hidden>
+      <span class="section-kicker">AI STUDY AID</span>
+      <h2 id="ai-summary-title">Lesson at a glance</h2>
+      <p id="ai-summary-status" role="status" aria-live="polite"></p>
+      <div id="ai-summary-result" hidden>
+        <p id="ai-summary-text"></p>
+        <div class="ai-summary-columns">
+          <div><h3>Key points</h3><ul id="ai-summary-points"></ul></div>
+          <div><h3>Important concepts</h3><ul id="ai-summary-concepts"></ul></div>
+        </div>
+      </div>
+    </section>
 
     <div class="lesson-layout">
       <article id="lesson-content" class="lesson-content" aria-label="Lesson content">
@@ -103,6 +117,59 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
       };
       card.addEventListener('click', flip);
       card.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flip(); } });
+    });
+  </script>
+  <script>
+    const summaryButton = document.querySelector<HTMLButtonElement>('#ai-summary-button');
+    const summaryCard = document.querySelector<HTMLElement>('#ai-summary-card');
+    const summaryStatus = document.querySelector<HTMLElement>('#ai-summary-status');
+    const summaryResult = document.querySelector<HTMLElement>('#ai-summary-result');
+    const summaryText = document.querySelector<HTMLElement>('#ai-summary-text');
+    const pointsList = document.querySelector<HTMLUListElement>('#ai-summary-points');
+    const conceptsList = document.querySelector<HTMLUListElement>('#ai-summary-concepts');
+
+    function showItems(list: HTMLUListElement, items: string[]) {
+      list.replaceChildren(...items.map((item) => {
+        const row = document.createElement('li');
+        row.textContent = item;
+        return row;
+      }));
+    }
+
+    summaryButton?.addEventListener('click', async () => {
+      if (!summaryCard || !summaryStatus || !summaryResult || !summaryText || !pointsList || !conceptsList) return;
+      const content = [...document.querySelectorAll<HTMLElement>('#lesson-content .prose')]
+        .map((section) => section.innerText.trim()).filter(Boolean).join('\n\n');
+      summaryCard.hidden = false;
+      summaryButton.setAttribute('aria-expanded', 'true');
+      summaryButton.disabled = true;
+      summaryButton.textContent = 'Generating…';
+      summaryResult.hidden = true;
+      summaryStatus.hidden = false;
+      summaryStatus.textContent = 'Creating your lesson summary…';
+
+      try {
+        const response = await fetch('/.netlify/functions/ai-summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Could not create a summary. Please try again.');
+        if (typeof data.summary !== 'string' || !Array.isArray(data.keyPoints) || !Array.isArray(data.importantConcepts)) {
+          throw new Error('The summary response was incomplete. Please try again.');
+        }
+        summaryText.textContent = data.summary;
+        showItems(pointsList, data.keyPoints);
+        showItems(conceptsList, data.importantConcepts);
+        summaryResult.hidden = false;
+        summaryStatus.hidden = true;
+      } catch (error) {
+        summaryStatus.textContent = error instanceof Error ? error.message : 'Could not create a summary. Please try again.';
+      } finally {
+        summaryButton.disabled = false;
+        summaryButton.textContent = '✨ AI Summary';
+      }
     });
   </script>
 </BaseLayout>
