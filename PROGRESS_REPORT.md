@@ -49,3 +49,17 @@ Open the built site in a regular browser to visually review phone, tablet, lapto
 ## Deployment note
 
 For a custom domain, set `SITE_URL` to its public origin in Netlify and rebuild. Without that setting, Netlify's `URL` build variable supplies the canonical and sitemap origin.
+
+# Phase 3.3 — Fix Sitemap Generation
+
+## Changes
+
+- Validate subject and lesson slugs before constructing sitemap paths. Lesson paths must match the routes generated from their subject and lesson slugs.
+- Validate each absolute sitemap URL before writing it; skip empty, malformed, or off-origin paths, and remove duplicates.
+- Keep `subjects/` as the source of truth. Content architecture, routing, and SEO page metadata are unchanged.
+
+## Verification
+
+- `npm run check` — passed with 0 errors, 0 warnings, and 0 hints.
+- `npm run build` — passed; 11 content pages generated.
+- Parsed the generated sitemap and compared it with built `index.html` routes: all 11 URLs are nonempty and unique, with no missing or extra page routes.
