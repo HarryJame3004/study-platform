@@ -49,7 +49,13 @@ export default async function aiSummary(request) {
         },
       }),
     });
-    if (!response.ok) return json({ error: 'AI Summary is unavailable right now. Please try again.' }, 502);
+    if (!response.ok) {
+  const errorText = await response.text();
+  return json({
+    error: 'Gemini API error',
+    details: errorText
+  }, 502);
+}
 
     const result = await response.json();
     const generatedText = result.candidates?.[0]?.content?.parts
