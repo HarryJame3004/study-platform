@@ -15,7 +15,7 @@ Open the URL printed by Astro. Run `npm run check` for TypeScript and Astro diag
 
 ## Add a subject
 
-Create `subjects/<subject-slug>/` at the repository root. The directory alone appears as a subject with a name derived from its slug. For a custom name, description, and color, add `subject.json`:
+Create `subjects/<subject-slug>/` at the repository root. A subject appears on the site once it has at least one lesson with body content. Its default name comes from the directory slug. For a custom name, description, and color, add `subject.json`:
 
 ```json
 {
@@ -25,7 +25,7 @@ Create `subjects/<subject-slug>/` at the repository root. The directory alone ap
 }
 ```
 
-`color` may be `blue`, `green`, `purple`, `orange`, or `red`; unknown values use blue. The directory name becomes the URL slug. Subjects without lessons still get a page. A new build discovers the subject automatically.
+`color` may be `blue`, `green`, `purple`, `orange`, or `red`; unknown values use blue. The directory name becomes the URL slug. Empty placeholder folders, metadata-only subjects, and subjects without a usable lesson are omitted from pages and the sitemap. A new build discovers eligible subjects automatically.
 
 ## Add a lesson
 

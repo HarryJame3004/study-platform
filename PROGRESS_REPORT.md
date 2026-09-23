@@ -63,3 +63,39 @@ For a custom domain, set `SITE_URL` to its public origin in Netlify and rebuild.
 - `npm run check` — passed with 0 errors, 0 warnings, and 0 hints.
 - `npm run build` — passed; 11 content pages generated.
 - Parsed the generated sitemap and compared it with built `index.html` routes: all 11 URLs are nonempty and unique, with no missing or extra page routes.
+
+# Phase 3.4 — Clean Subject Discovery
+
+## Changes
+
+- Subject discovery now publishes only subjects with at least one usable lesson. Lessons with empty Markdown bodies are ignored.
+- Placeholder folders and metadata-only subjects remain in `subjects/` but no longer appear on the home page, in search, as generated subject pages, or in the sitemap.
+- Updated the website README to describe when a subject becomes visible. Lesson format and route patterns are unchanged.
+
+## Verification
+
+- `npm run check` — passed with 0 errors, 0 warnings, and 0 hints.
+- `npm run build` — passed; 4 pages generated: home, Computer Architecture, and its two lessons.
+- Parsed `sitemap.xml` and compared it with built HTML routes: exactly the same 4 URLs, with no empty or duplicate entries and no placeholder subjects.
+
+# Phase 5.1 — Global Study Platform Publish Command
+
+## Files created
+
+- `scripts/up` — executable publish command for `~/study-platform`.
+- `scripts/install-up.sh` — executable user-level installer for `~/.local/bin/up`.
+
+## How it works
+
+The command finds `~/study-platform` using the user's home directory, changes into it, and verifies that it is the Git repository root. If `git status --porcelain` finds no changes, it prints `Nothing to update` and exits successfully. Otherwise it runs `git add .`, `git commit -m "Update learning content"`, and `git push` in that order. It prints a success message only after the push succeeds. It does not use force push or operate on another repository.
+
+## Installation
+
+Run `~/study-platform/scripts/install-up.sh` in a normal user terminal. The installer copies the command to `~/.local/bin/up` with executable permissions. Ensure `~/.local/bin` is in `PATH`; it is already present in this environment's `PATH`. After installation, `up` can be run from any directory.
+
+## Testing results and environment limit
+
+- `bash -n` passed for both scripts; `git diff --check` passed.
+- The installer created an executable `up` command in a temporary home directory.
+- With Git mocked to prevent a real commit and push, running `up` from `/home/khoi` printed `Nothing to update` for a clean status. Running it from `/home/khoi/Downloads` used the expected add, commit, and push sequence and printed success. Every Git call ran from `/home/khoi/study-platform`.
+- Installing to the actual `/home/khoi/.local/bin/up` was rejected because that directory is read-only in this workspace sandbox. Actual global invocation and live Git push remain unverified until installation is run in a normal user terminal.

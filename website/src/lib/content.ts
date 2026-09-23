@@ -92,6 +92,7 @@ function loadLessons(subjectSlug: string, subjectPath: string): Lesson[] {
       const raw = readOptional(join(path, 'lesson.md'));
       if (!raw.trim()) return [];
       const { data, content } = matter(raw);
+      if (!content.trim()) return [];
       const title = typeof data.title === 'string' ? data.title : displayName(entry.name);
       const date = typeof data.date === 'string' ? data.date : data.date instanceof Date ? data.date.toISOString().slice(0, 10) : '';
       return [{
@@ -123,5 +124,6 @@ export function getSubjects(): Subject[] {
         lessons: loadLessons(entry.name, path),
       };
     })
+    .filter((subject) => subject.lessons.length > 0)
     .sort((a, b) => a.name.localeCompare(b.name));
 }

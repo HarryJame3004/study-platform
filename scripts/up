@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo="$HOME/study-platform"
+if [[ ! -d "$repo/.git" ]]; then
+  printf 'Study Platform repository not found at %s\n' "$repo" >&2
+  exit 1
+fi
+
+cd -- "$repo"
+repo_path="$(pwd -P)"
+git_root="$(git rev-parse --show-toplevel)"
+if [[ "$git_root" != "$repo_path" ]]; then
+  printf 'Refusing to publish: %s is not the Study Platform repository root\n' "$repo" >&2
+  exit 1
+fi
+
+if [[ -z "$(git status --porcelain)" ]]; then
+  printf 'Nothing to update\n'
+  exit 0
+fi
+
+git add .
+git commit -m "Update learning content"
+git push
+printf 'Study Platform published successfully.\n'
