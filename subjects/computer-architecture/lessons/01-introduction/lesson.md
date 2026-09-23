@@ -1,6 +1,6 @@
 ---
 title: "Introduction to Computer Architecture"
-date: "YYYY-MM-DD"
+date: "2026-09-23"
 subject: "computer-architecture"
 ---
 
@@ -8,25 +8,35 @@ subject: "computer-architecture"
 
 After this lesson, you should understand:
 
-- What computer architecture is.
+- What computer architecture means.
 - The main components of a computer system.
-- How CPU, memory, and I/O interact.
+- How hardware components work together.
 
 # Lesson
 
-Write the explanation here.
+Computer Architecture studies how computer systems are designed and how hardware components communicate to execute programs.
 
-# Important Concepts
+Main components include:
 
 - CPU
 - Memory
-- Input/Output
-- Instruction execution
+- Input/Output systems
+- Storage
+
+# Important Concepts
+
+## CPU
+
+The processor that executes instructions and controls operations.
+
+## Memory
+
+Stores instructions and data needed by the CPU.
 
 # Examples
 
-Add examples here.
+A program execution involves the CPU fetching instructions from memory, processing them, and storing results.
 
 # Summary
 
-Write the key ideas from this lesson.
+Computer architecture explains the relationship between hardware components and how computers execute tasks.
