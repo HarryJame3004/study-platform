@@ -1,0 +1,7 @@
+{
+  "id": "linux",
+  "name": "Linux",
+  "description": "Linux system learning materials, commands, and administration concepts.",
+  "icon": "terminal",
+  "color": "orange"
+}
