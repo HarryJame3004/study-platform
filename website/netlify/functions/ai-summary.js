@@ -1,4 +1,4 @@
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
 const MAX_CONTENT_LENGTH = 30_000;
 
 function json(data, status = 200, extraHeaders = {}) {
