@@ -133,3 +133,34 @@ Run `~/study-platform/scripts/install-up.sh` in a normal user terminal. The inst
 - `npm run build` — passed; 4 static pages generated.
 - Inspected the cat source and generated social image visually. Confirmed generated image dimensions: favicon 16 × 16 and 32 × 32, touch icon 180 × 180, and Open Graph image 1200 × 630.
 - Checked built home and lesson HTML for cat branding, valid icon links, and the Open Graph image. The lesson still includes the AI Summary button.
+
+# Phase 6.2 — AI Exercise Generator
+
+## Changes
+
+- Added `website/netlify/functions/ai-exercise.js`. It reads `GEMINI_API_KEY` server-side, accepts lesson text by POST, asks Gemini 3.6 Flash for structured practice exercises, validates the response, and returns an `exercises` array with `question`, `answer`, and `explanation` fields.
+- Added a **📝 Generate Practice** button to each lesson page. Generated questions appear in a card list, with answers and explanations behind reveal controls. The UI includes loading, retry, and error states.
+- Updated `website/README.md` with the endpoint, response shape, and Netlify environment setup. AI Summary was not modified; `subjects/`, lesson format, routing, and deployment architecture remain unchanged.
+
+## Verification
+
+- `npm run check` — passed with 0 errors, 0 warnings, and 0 hints.
+- `npm run build` — passed; 4 static pages generated.
+- Mocked function checks passed for POST handling, input limits, missing key, Gemini request schema, valid response, malformed response, and upstream failure.
+- Inspected a built lesson page: it contains the new practice button and endpoint, retains AI Summary, and contains no API key.
+- A live Gemini or deployed Netlify Function call was not run in this environment.
+
+# Phase 6.1.1 — Bilingual AI Summary
+
+## Changes
+
+- Updated `website/netlify/functions/ai-summary.js` to request structured Vietnamese and English summaries in one Gemini response. Each language contains `summary`, `keyPoints`, and `importantConcepts`; the function validates both sections before returning them.
+- Updated the lesson AI Summary card to show separate 🇻🇳 Vietnamese and 🇬🇧 English panels. Each panel displays its summary, key points, and important concepts, with language attributes and responsive styling for mobile and dark mode.
+- Updated `website/README.md` with the bilingual response shape. AI Exercise Generator, `subjects/`, lesson format, routing, and deployment settings are unchanged.
+
+## Verification
+
+- `npm run check` — passed with 0 errors, 0 warnings, and 0 hints.
+- `npm run build` — passed; 4 static pages generated.
+- Mocked function checks passed for request schema, both language outputs, trimmed values, missing language, empty key points, and request validation.
+- Inspected built lesson HTML for both language panels and the unchanged Generate Practice feature. Live Gemini and deployed Netlify calls were not run here.

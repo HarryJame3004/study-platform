@@ -34,12 +34,23 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
       <span class="section-kicker">AI STUDY AID</span>
       <h2 id="ai-summary-title">Lesson at a glance</h2>
       <p id="ai-summary-status" role="status" aria-live="polite"></p>
-      <div id="ai-summary-result" hidden>
-        <p id="ai-summary-text"></p>
-        <div class="ai-summary-columns">
-          <div><h3>Key points</h3><ul id="ai-summary-points"></ul></div>
-          <div><h3>Important concepts</h3><ul id="ai-summary-concepts"></ul></div>
-        </div>
+      <div id="ai-summary-result" class="ai-summary-languages" hidden>
+        <article class="ai-summary-language" lang="vi">
+          <h3>🇻🇳 Vietnamese</h3>
+          <p id="ai-summary-vi-text"></p>
+          <div class="ai-summary-columns">
+            <div><h4>Ý chính</h4><ul id="ai-summary-vi-points"></ul></div>
+            <div><h4>Khái niệm quan trọng</h4><ul id="ai-summary-vi-concepts"></ul></div>
+          </div>
+        </article>
+        <article class="ai-summary-language" lang="en">
+          <h3>🇬🇧 English</h3>
+          <p id="ai-summary-en-text"></p>
+          <div class="ai-summary-columns">
+            <div><h4>Key points</h4><ul id="ai-summary-en-points"></ul></div>
+            <div><h4>Important concepts</h4><ul id="ai-summary-en-concepts"></ul></div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -59,6 +70,14 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
         <div class="reading-tip">✦ <span>Take your time. Understanding grows with each pass.</span></div>
       </aside>
     </div>
+
+    <section class="practice-section ai-exercise-section" aria-labelledby="ai-exercise-heading">
+      <div class="section-heading"><div><span class="section-kicker">PRACTICE THE IDEAS</span><h2 id="ai-exercise-heading">Fresh practice</h2></div></div>
+      <p class="section-note">Create new questions from this lesson and reveal the answers when you are ready.</p>
+      <button id="ai-exercise-button" class="ai-exercise-button" type="button" aria-controls="ai-exercise-result" aria-expanded="false">📝 Generate Practice</button>
+      <p id="ai-exercise-status" class="ai-exercise-status" role="status" aria-live="polite" hidden></p>
+      <div id="ai-exercise-result" class="ai-exercise-grid" hidden></div>
+    </section>
 
     {lesson.exercises.length > 0 && <section class="practice-section" id="exercises" aria-labelledby="exercises-heading">
       <div class="section-heading"><div><span class="section-kicker">PUT IT INTO PRACTICE</span><h2 id="exercises-heading">Exercises</h2></div><span class="section-count">{String(lesson.exercises.length).padStart(2, '0')} questions</span></div>
@@ -124,9 +143,15 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
     const summaryCard = document.querySelector<HTMLElement>('#ai-summary-card');
     const summaryStatus = document.querySelector<HTMLElement>('#ai-summary-status');
     const summaryResult = document.querySelector<HTMLElement>('#ai-summary-result');
-    const summaryText = document.querySelector<HTMLElement>('#ai-summary-text');
-    const pointsList = document.querySelector<HTMLUListElement>('#ai-summary-points');
-    const conceptsList = document.querySelector<HTMLUListElement>('#ai-summary-concepts');
+
+    type SummarySection = { summary: string; keyPoints: string[]; importantConcepts: string[] };
+    function validSummary(value: unknown): value is SummarySection {
+      if (!value || typeof value !== 'object') return false;
+      const section = value as Partial<SummarySection>;
+      return typeof section.summary === 'string' && !!section.summary.trim() &&
+        Array.isArray(section.keyPoints) && section.keyPoints.every((item) => typeof item === 'string') &&
+        Array.isArray(section.importantConcepts) && section.importantConcepts.every((item) => typeof item === 'string');
+    }
 
     function showItems(list: HTMLUListElement, items: string[]) {
       list.replaceChildren(...items.map((item) => {
@@ -136,8 +161,19 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
       }));
     }
 
+    function renderSummary(section: SummarySection, language: 'vi' | 'en'): boolean {
+      const text = document.querySelector<HTMLElement>(`#ai-summary-${language}-text`);
+      const points = document.querySelector<HTMLUListElement>(`#ai-summary-${language}-points`);
+      const concepts = document.querySelector<HTMLUListElement>(`#ai-summary-${language}-concepts`);
+      if (!text || !points || !concepts) return false;
+      text.textContent = section.summary;
+      showItems(points, section.keyPoints);
+      showItems(concepts, section.importantConcepts);
+      return true;
+    }
+
     summaryButton?.addEventListener('click', async () => {
-      if (!summaryCard || !summaryStatus || !summaryResult || !summaryText || !pointsList || !conceptsList) return;
+      if (!summaryCard || !summaryStatus || !summaryResult) return;
       const content = [...document.querySelectorAll<HTMLElement>('#lesson-content .prose')]
         .map((section) => section.innerText.trim()).filter(Boolean).join('\n\n');
       summaryCard.hidden = false;
@@ -155,13 +191,11 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
           body: JSON.stringify({ content }),
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Could not create a summary. Please try again.');
-        if (typeof data.summary !== 'string' || !Array.isArray(data.keyPoints) || !Array.isArray(data.importantConcepts)) {
+        if (!response.ok) throw new Error(data?.error || 'Could not create a summary. Please try again.');
+        if (!validSummary(data?.vietnamese) || !validSummary(data?.english) ||
+            !renderSummary(data.vietnamese, 'vi') || !renderSummary(data.english, 'en')) {
           throw new Error('The summary response was incomplete. Please try again.');
         }
-        summaryText.textContent = data.summary;
-        showItems(pointsList, data.keyPoints);
-        showItems(conceptsList, data.importantConcepts);
         summaryResult.hidden = false;
         summaryStatus.hidden = true;
       } catch (error) {
@@ -169,6 +203,68 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
       } finally {
         summaryButton.disabled = false;
         summaryButton.textContent = '✨ AI Summary';
+      }
+    });
+  </script>
+  <script>
+    const exerciseButton = document.querySelector<HTMLButtonElement>('#ai-exercise-button');
+    const exerciseStatus = document.querySelector<HTMLElement>('#ai-exercise-status');
+    const exerciseResult = document.querySelector<HTMLElement>('#ai-exercise-result');
+
+    exerciseButton?.addEventListener('click', async () => {
+      if (!exerciseStatus || !exerciseResult) return;
+      const content = [...document.querySelectorAll<HTMLElement>('#lesson-content .prose')]
+        .map((section) => section.innerText.trim()).filter(Boolean).join('\n\n');
+      exerciseButton.disabled = true;
+      exerciseButton.textContent = 'Generating…';
+      exerciseButton.setAttribute('aria-expanded', 'true');
+      exerciseResult.hidden = true;
+      exerciseStatus.hidden = false;
+      exerciseStatus.textContent = 'Creating practice exercises…';
+
+      try {
+        const response = await fetch('/.netlify/functions/ai-exercise', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Could not generate practice. Please try again.');
+        if (!Array.isArray(data.exercises) || !data.exercises.length ||
+            !data.exercises.every((item: { question?: unknown; answer?: unknown; explanation?: unknown }) =>
+              typeof item?.question === 'string' && typeof item.answer === 'string' && typeof item.explanation === 'string')) {
+          throw new Error('The practice response was incomplete. Please try again.');
+        }
+
+        const cards = data.exercises.map((exercise: { question: string; answer: string; explanation: string }, index: number) => {
+          const card = document.createElement('article');
+          card.className = 'ai-exercise-card';
+          const number = document.createElement('span');
+          number.className = 'section-kicker';
+          number.textContent = `QUESTION ${String(index + 1).padStart(2, '0')}`;
+          const question = document.createElement('h3');
+          question.textContent = exercise.question;
+          const details = document.createElement('details');
+          const reveal = document.createElement('summary');
+          reveal.textContent = 'Show answer';
+          const answer = document.createElement('p');
+          const label = document.createElement('strong');
+          label.textContent = 'Answer: ';
+          answer.append(label, document.createTextNode(exercise.answer));
+          const explanation = document.createElement('p');
+          explanation.textContent = exercise.explanation;
+          details.append(reveal, answer, explanation);
+          card.append(number, question, details);
+          return card;
+        });
+        exerciseResult.replaceChildren(...cards);
+        exerciseResult.hidden = false;
+        exerciseStatus.hidden = true;
+      } catch (error) {
+        exerciseStatus.textContent = error instanceof Error ? error.message : 'Could not generate practice. Please try again.';
+      } finally {
+        exerciseButton.disabled = false;
+        exerciseButton.textContent = '📝 Generate Practice';
       }
     });
   </script>

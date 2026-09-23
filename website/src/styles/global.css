@@ -214,8 +214,12 @@ h1, h2, h3, p { margin-top: 0; }
 .ai-summary-card h2 { margin: 9px 0 16px; font-size: 22px; letter-spacing: -.04em; }
 .ai-summary-card p { color: var(--ink-soft); font-size: 13px; line-height: 1.7; white-space: pre-line; }
 .ai-summary-card #ai-summary-status { margin: 0; color: var(--muted); }
-.ai-summary-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
-.ai-summary-columns h3 { margin: 0 0 11px; font-size: 13px; }
+.ai-summary-languages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.ai-summary-language { min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
+.ai-summary-language h3 { margin: 0 0 13px; font-size: 17px; }
+.ai-summary-language p { margin-bottom: 0; }
+.ai-summary-columns { display: grid; gap: 18px; margin-top: 20px; padding-top: 17px; border-top: 1px solid var(--line); }
+.ai-summary-columns h4 { margin: 0 0 9px; font-size: 12px; }
 .ai-summary-columns ul { margin: 0; padding-left: 20px; color: var(--ink-soft); font-size: 12px; line-height: 1.65; }
 .ai-summary-columns li { margin: 6px 0; }
 .ai-summary-columns li::marker { color: var(--accent); }
@@ -256,6 +260,18 @@ h1, h2, h3, p { margin-top: 0; }
 .reading-tip { display: flex; gap: 9px; margin: 16px 3px; color: var(--accent); font-size: 13px; }
 .reading-tip span { color: var(--muted); font-size: 10px; line-height: 1.5; }
 .practice-section { margin-top: 62px; scroll-margin-top: 20px; }
+.ai-exercise-section { max-width: 925px; }
+.ai-exercise-button { padding: 11px 16px; border: 1px solid var(--accent); border-radius: 9px; background: var(--accent-soft); color: var(--accent-deep); font-size: 12px; font-weight: 750; }
+.ai-exercise-button:hover { background: var(--accent); color: var(--surface); }
+.ai-exercise-button:disabled { cursor: wait; opacity: .7; }
+.ai-exercise-status { margin: 16px 0 0; color: var(--muted); font-size: 12px; }
+.ai-exercise-grid { display: grid; gap: 13px; margin-top: 19px; }
+.ai-exercise-card { padding: 22px 25px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
+.ai-exercise-card .section-kicker { color: var(--accent); }
+.ai-exercise-card h3 { margin: 10px 0 16px; color: var(--ink); font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.ai-exercise-card details { border-top: 1px solid var(--line); padding-top: 12px; }
+.ai-exercise-card summary { color: var(--accent-deep); cursor: pointer; font-size: 12px; font-weight: 750; }
+.ai-exercise-card details p { margin: 12px 0 0; color: var(--ink-soft); font-size: 12px; line-height: 1.65; white-space: pre-line; overflow-wrap: anywhere; }
 .exercise-grid { display: grid; gap: 13px; }
 .exercise-card { padding: 20px 24px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
 .exercise-top { display: flex; align-items: center; gap: 9px; margin-bottom: 15px; color: var(--accent); font-size: 9px; font-weight: 800; letter-spacing: .14em; }
@@ -355,7 +371,7 @@ h1, h2, h3, p { margin-top: 0; }
   .lesson-sidebar { display: none; }
   .lesson-hero { padding: 43px 0 34px; }
   .lesson-hero h1 { font-size: 42px; }
-  .ai-summary-columns { grid-template-columns: 1fr; gap: 20px; }
+  .ai-summary-languages { grid-template-columns: 1fr; }
   .flashcard-grid { grid-template-columns: 1fr; }
   .practice-section { margin-top: 52px; }
 }
