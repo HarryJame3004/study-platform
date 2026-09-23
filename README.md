@@ -6,7 +6,6 @@ A personal learning system for organizing knowledge, lessons, exercises, and fla
 
 Study is designed as a long-term personal knowledge platform:
 
-- Learn with ChatGPT Web
 - Store learning content in GitHub
 - Use Codex to build and maintain the website
 - Access everything through a modern study interface
