@@ -6,11 +6,11 @@ What is computer architecture?
 
 ### Hint
 
-Think about how hardware components work together.
+Think about how computer hardware components work together.
 
 ### Answer
 
-Write explanation here.
+Computer architecture is the study of how computer systems are designed, including the organization and interaction of CPU, memory, storage, and I/O components.
 
 ---
 
@@ -24,4 +24,4 @@ Consider instruction execution.
 
 ### Answer
 
-Write explanation here.
+The CPU fetches instructions and data from memory, processes them, and stores results. Memory provides the information required for the CPU to execute programs.
