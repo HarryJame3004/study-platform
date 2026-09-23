@@ -8,7 +8,7 @@ What is computer architecture?
 
 Back:
 
-The design and organization of computer systems, including hardware components and their interactions.
+Computer architecture is the design and organization of computer systems, including how hardware components interact to execute programs.
 
 ---
 
@@ -20,4 +20,16 @@ What are the main components of a computer system?
 
 Back:
 
-CPU, memory, and input/output systems.
+CPU, memory, storage, and input/output systems.
+
+---
+
+## Card 3
+
+Front:
+
+What does the CPU do?
+
+Back:
+
+The CPU executes instructions and controls operations inside the computer system.
