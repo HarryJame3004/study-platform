@@ -1,0 +1,7 @@
+{
+  "id": "computer-architecture",
+  "name": "Computer Architecture",
+  "description": "Understanding how computers work from hardware level upward.",
+  "icon": "cpu",
+  "color": "blue"
+}
