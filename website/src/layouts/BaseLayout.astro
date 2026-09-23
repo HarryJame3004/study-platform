@@ -3,8 +3,12 @@ import '../styles/global.css';
 import 'katex/dist/katex.min.css';
 import { getSubjects } from '../lib/content';
 
-interface Props { title: string; description?: string; }
-const { title, description = 'Your personal learning system.' } = Astro.props;
+interface Props { title: string; description?: string; type?: 'website' | 'article'; }
+const { title, description, type = 'website' } = Astro.props;
+const pageTitle = title === 'Study' ? 'Study | Your personal learning system' : `${title} | Study`;
+const pageDescription = description?.trim() || 'Explore subjects, read lessons, and practice what you learn with Study.';
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
+const socialImage = new URL('/og-image.png', canonical);
 const subjects = getSubjects();
 const searchable = subjects.flatMap((subject) => [
   { title: subject.name, detail: 'Subject', url: `/subjects/${subject.slug}/` },
@@ -17,13 +21,25 @@ const onHome = Astro.url.pathname === '/';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonical.href} />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Study" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={socialImage.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Study — your personal learning system" />
     <meta name="theme-color" content="#f6f7fb" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <script is:inline>
       try { document.documentElement.dataset.theme = localStorage.getItem('study-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch {}
     </script>
-    <title>{title === 'Study' ? title : `${title} · Study`}</title>
+    <title>{pageTitle}</title>
   </head>
   <body>
     <div class="app-shell">

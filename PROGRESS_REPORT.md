@@ -26,3 +26,26 @@ The interface now uses a soft violet and blue palette, rounded white surfaces, g
 ## Next steps
 
 Open the built site in a regular browser to visually review phone, tablet, laptop, and dark mode layouts, then adjust any device-specific spacing found there. No content or architecture changes are needed for this phase.
+
+# Phase 3.2 — Study Platform SEO Setup
+
+## Changes
+
+- Added page titles and descriptions for home, subjects, and lessons. Subject names and descriptions come from existing subject metadata; lesson titles include their subject names.
+- Added canonical URLs and Open Graph title, description, URL, type, site name, and image metadata in the shared layout. Lesson pages use the `article` type.
+- Kept the existing SVG favicon and added a 32 px PNG fallback and 180 px Apple touch icon. Added a 1200 × 630 social preview image.
+- Added generated `robots.txt` and `sitemap.xml` endpoints. The sitemap includes the home page, every subject, and every published lesson found by the current content loader.
+- Configured the site origin from `SITE_URL`, then Netlify's `URL`, with a localhost fallback for local builds. Documented the setting in `website/README.md`.
+- Left `subjects/`, lesson format, content paths, and static Netlify deployment architecture unchanged.
+
+## Verification
+
+- `npm run check` — passed with 0 errors, 0 warnings, and 0 hints.
+- `npm run build` — passed; 11 content pages plus `robots.txt` and `sitemap.xml` generated.
+- Inspected generated metadata for home, Computer Architecture, and Boolean Algebra pages; titles, descriptions, canonical URLs, Open Graph values, and favicon links are present.
+- Inspected generated sitemap and robots output; all 11 content pages are listed, and robots points to the sitemap.
+- Confirmed the social preview PNG is 1200 × 630 and visually rendered as intended.
+
+## Deployment note
+
+For a custom domain, set `SITE_URL` to its public origin in Netlify and rebuild. Without that setting, Netlify's `URL` build variable supplies the canonical and sitemap origin.

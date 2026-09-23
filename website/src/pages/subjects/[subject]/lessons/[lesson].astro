@@ -16,7 +16,7 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
   return { title, kind, html, id: `lesson-section-${index + 1}` };
 });
 ---
-<BaseLayout title={lesson.title} description={`Study ${lesson.title} in ${subject.name}.`}>
+<BaseLayout title={`${lesson.title} | ${subject.name}`} description={`Learn ${lesson.title} in ${subject.name}. Read the lesson and practice with exercises and flashcards.`} type="article">
   <div class="inner-page lesson-page page-enter">
     <nav class="breadcrumbs" aria-label="Breadcrumb">
       <a href="/">Home</a><span>›</span><a href={`/subjects/${subject.slug}/`}>{subject.name}</a><span>›</span><span>{lesson.title}</span>

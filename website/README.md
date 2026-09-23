@@ -71,3 +71,9 @@ The interface uses system fonts and no additional UI dependency. Layouts adapt f
 ## Deploy to Netlify
 
 Connect the repository and set **Base directory** to `website`, **Build command** to `npm run build`, and **Publish directory** to `dist`. No adapter or server is needed. Netlify must check out the whole repository so the build can read `../subjects/`.
+
+## SEO and site URL
+
+Each page has a title, description, canonical URL, and Open Graph metadata. The build creates `robots.txt` and `sitemap.xml` from the same subjects and lessons used for the pages. The SVG favicon has PNG and Apple touch icon versions, and social previews use `og-image.png`.
+
+Set `SITE_URL` to the public site origin (for example, `https://study.example.com`) when using a custom domain. Otherwise, Netlify's `URL` build environment variable supplies the origin. Local builds use `http://localhost:4321` so previews and checks can run without deployment settings. Rebuild after changing the origin so canonical links, Open Graph URLs, robots.txt, and sitemap.xml use the new URL.
