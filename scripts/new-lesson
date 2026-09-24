@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# new-lesson <subject-slug> <lesson-name> [title]
+# Creates subjects/<subject>/lessons/<lesson-name>/ from the TEMPLATE lesson:
+#   lesson.md with frontmatter (title, date, subject), exercises.md, flashcards.md
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  printf 'Usage: new-lesson <subject-slug> <lesson-name> [title]\n' >&2
+  printf 'Example: new-lesson computer-architecture cpu-basics "CPU Basics"\n' >&2
+  exit 1
+fi
+
+subject="$1"
+lesson="$2"
+title="${3:-$(printf '%s' "$lesson" | sed -e 's/[-_]/ /g' -e 's/\b\(.\)/\U\1/')}"
+
+repo="$HOME/study-platform"
+if [[ ! -d "$repo/.git" ]]; then
+  printf 'Study Platform repository not found at %s\n' "$repo" >&2
+  exit 1
+fi
+
+subject_dir="$repo/subjects/$subject"
+lesson_dir="$subject_dir/lessons/$lesson"
+template_dir="$repo/subjects/computer-architecture/lessons/TEMPLATE"
+
+if [[ ! -d "$subject_dir" ]]; then
+  printf 'Subject "%s" does not exist. Add subjects/%s/subject.json first.\n' "$subject" "$subject" >&2
+  exit 1
+fi
+if [[ -e "$lesson_dir" ]]; then
+  printf 'Lesson already exists: %s\n' "$lesson_dir" >&2
+  exit 1
+fi
+if [[ ! -f "$template_dir/lesson.md" ]]; then
+  printf 'Template lesson not found at %s\n' "$template_dir" >&2
+  exit 1
+fi
+
+mkdir -p -- "$lesson_dir"
+
+today="$(date +%F)"
+sed -e "s/^title:.*/title: \"$title\"/" -e "s/^date:.*/date: \"$today\"/" \
+    -e "s/^subject:.*/subject: \"$subject\"/" "$template_dir/lesson.md" > "$lesson_dir/lesson.md"
+
+# Copy practice files as scaffolds, stripping any template placeholder content markers.
+cp -- "$template_dir/exercises.md" "$lesson_dir/exercises.md"
+cp -- "$template_dir/flashcards.md" "$lesson_dir/flashcards.md"
+
+printf 'Created lesson scaffold:\n'
+printf '  %s/lesson.md       (title: %s, date: %s)\n' "$lesson_dir" "$title" "$today"
+printf '  %s/exercises.md\n' "$lesson_dir"
+printf '  %s/flashcards.md\n' "$lesson_dir"
+printf 'Next: fill in the content, then run `up` to publish.\n'

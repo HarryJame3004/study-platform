@@ -394,6 +394,52 @@ h1, h2, h3, p { margin-top: 0; }
   .reading-objectives, .reading-summary { padding: 20px; }
   .exercise-card { padding: 17px; }
 }
+/* Study dashboard */
+.study-dashboard { margin-top: 55px; }
+.dash-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; }
+.dash-card { padding: 20px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
+.dash-card .section-kicker { display: block; margin-bottom: 14px; }
+.dash-stats { display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
+.dash-stat { display: flex; flex-direction: column; }
+.dash-stat-value { color: var(--accent-deep); font-size: 34px; font-weight: 790; letter-spacing: -.05em; line-height: 1; }
+.dash-stat-label { margin-top: 6px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.dash-heat { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.heat-cell { aspect-ratio: 1; border-radius: 4px; background: var(--soft); }
+.heat-cell[data-level="1"] { background: #c9c6f0; }
+.heat-cell[data-level="2"] { background: #948fe2; }
+.heat-cell[data-level="3"] { background: #6865bd; }
+:root[data-theme="dark"] .heat-cell[data-level="1"] { background: #3d3f63; }
+:root[data-theme="dark"] .heat-cell[data-level="2"] { background: #565492; }
+:root[data-theme="dark"] .heat-cell[data-level="3"] { background: #8f8bdb; }
+.dash-hint { margin: 12px 0 0; color: var(--muted); font-size: 10px; }
+.dash-progress, .dash-due { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; }
+.dash-progress-row { display: flex; align-items: center; gap: 11px; }
+.dash-progress-label { flex: 1; min-width: 0; overflow: hidden; color: var(--ink-soft); font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.dash-progress-track { width: 64px; height: 5px; overflow: hidden; flex: none; border-radius: 99px; background: var(--soft); }
+.dash-progress-fill { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.dash-progress-value { flex: none; color: var(--muted); font-size: 10px; font-weight: 700; }
+.dash-due a { flex: 1; min-width: 0; overflow: hidden; color: var(--accent-deep); font-size: 11px; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; text-overflow: ellipsis; white-space: nowrap; }
+.dash-due-badge { min-width: 22px; display: grid; place-items: center; padding: 2px 6px; border-radius: 99px; background: var(--accent-soft); color: var(--accent-deep); font-size: 10px; font-weight: 800; }
+.dash-empty { color: var(--muted); font-size: 11px; line-height: 1.6; }
+.dash-subject-data { display: none; }
+
+/* Spaced repetition grade buttons on flashcard backs */
+.srs-grade-row { display: flex; align-items: center; gap: 7px; padding-top: 4px; margin-top: auto; }
+.srs-box-label { color: var(--accent); font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.srs-grade { padding: 6px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink-soft); font-size: 10px; font-weight: 750; transition: background .2s, color .2s, border-color .2s; }
+.srs-grade:hover { border-color: var(--accent); }
+.srs-again:hover { background: #faeaf0; color: #bc7e8e; }
+.srs-good:hover { background: var(--accent-soft); color: var(--accent-deep); }
+.srs-easy:hover { background: #e4f3ed; color: #609a85; }
+.flashcard[data-srs] .flashcard-front::after { content: "Box " attr(data-srs); display: inline-block; margin-top: 8px; padding: 2px 7px; border-radius: 99px; background: var(--accent-soft); color: var(--accent-deep); font-size: 9px; font-weight: 800; letter-spacing: .1em; }
+
+@media (max-width: 1160px) {
+  .dash-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 680px) {
+  .dash-grid { grid-template-columns: 1fr; }
+  .study-dashboard { margin-top: 44px; }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }

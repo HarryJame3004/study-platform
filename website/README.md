@@ -56,6 +56,12 @@ Summarize the lesson.
 
 Optionally add `exercises.md` and `flashcards.md` in the same folder. The site discovers the lesson on the next build. The `TEMPLATE` lesson directory is excluded.
 
+A `new-lesson` command can scaffold this for you (see `scripts/new-lesson` at the repository root; install it next to `up` with `scripts/install-up.sh`):
+
+```sh
+new-lesson computer-architecture cpu-basics "CPU Basics"
+```
+
 Exercises can use `## Question 1` with `### Hint` and `### Answer`, or `### Question 1` within a `##` topic. A plain `Answer:` line also creates a revealable answer. Sections without an answer remain visible as practice notes. Flashcards use `## Card 1`, then `Front:` and `Back:` lines (or `### Front` and `### Back` headings). Separate cards with the next `## Card` heading. See existing lessons for examples.
 
 Markdown supports code blocks, tables, and KaTeX math with `$...$` and `$$...$$`. HTML in Markdown is disabled. Recent lessons are sorted by frontmatter date. Continue Learning remembers the last opened lesson in the current browser; without history it links to the newest lesson.
@@ -73,6 +79,35 @@ The interface uses system fonts and no additional UI dependency. Layouts adapt f
 Connect the repository and set **Base directory** to `website`, **Build command** to `npm run build`, and **Publish directory** to `dist`. No Astro adapter is needed. Netlify must check out the whole repository so the build can read `../subjects/`. Netlify discovers `netlify/functions/ai-summary.js` and `netlify/functions/ai-exercise.js` under the same base directory and exposes them at `/.netlify/functions/ai-summary` and `/.netlify/functions/ai-exercise`.
 
 For AI features, set `GEMINI_API_KEY` in Netlify's environment variables with access for Functions, then redeploy. The key is read only by the functions and is never included in the browser build. A normal `npm run dev` or `npm run preview` serves the static site without Netlify Functions; use Netlify Dev or the deployed site to exercise the AI buttons. Both functions accept POST requests with JSON `{ "content": "lesson text" }`. The summary function returns `vietnamese` and `english` objects, each containing `summary`, `keyPoints`, and `importantConcepts`; the exercise function returns an `exercises` array containing `question`, `answer`, and `explanation` for each item.
+
+### AI function protection and cache
+
+Both functions share two helper modules in `netlify/functions/`:
+
+- `_ai-guard.js` — rejects requests whose `Origin` is not the study site (the production domain, localhost, or a Netlify deploy preview) and rate limits each visitor to 10 requests per minute. Exceeding the limit returns HTTP 429 with a friendly message.
+- `_ai-cache.js` — stores finished results in Netlify Blobs keyed by a SHA-256 hash of the lesson text for up to 7 days. Repeating the same request returns the cached copy instantly (`"cached": true` in the response) and costs no Gemini quota.
+
+Netlify Blobs works automatically on Netlify with no extra setup. Cache and rate-limit responses are best-effort: if Blobs is unavailable, generation still proceeds normally.
+
+## Client feature modules
+
+Browser features live as one file per feature in `website/src/scripts/`, imported by the pages that need them:
+
+| File | Feature |
+| --- | --- |
+| `theme.ts` | Light/dark switch |
+| `search.ts` | Search dialog and Ctrl/⌘ K |
+| `continue-learning.ts` | Continue Learning card |
+| `reading-progress.ts` | Saved reading position |
+| `lesson-tracker.ts` | Daily activity, visited lessons, last-lesson record |
+| `study-dashboard.ts` | Home dashboard: streak, activity heat, subject progress, due reviews |
+| `exercise-reveal.ts` | Exercise answer disclosure |
+| `flashcard-flip.ts` | Flashcard flip interaction |
+| `srs-recorder.ts` | Leitner spaced repetition schedule for flashcards |
+| `ai-summary.ts` | AI Summary button and card |
+| `ai-exercise.ts` | Generate Practice button and cards |
+
+`@netlify/blobs` is a runtime dependency of the functions only; the browser bundle does not include it.
 
 ## SEO and site URL
 

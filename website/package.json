@@ -9,6 +9,7 @@
     "check": "astro check"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.0",
     "astro": "^5.0.0",
     "gray-matter": "^4.0.3",
     "katex": "^0.16.0",

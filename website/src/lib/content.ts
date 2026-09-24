@@ -47,6 +47,21 @@ function readOptional(path: string): string {
   return existsSync(path) ? readFileSync(path, 'utf8') : '';
 }
 
+function parseSubjectMetadata(raw: string): Record<string, unknown> {
+  if (!raw.trim()) return {};
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Remove a Markdown thematic break that separators left at the edge of a chunk. */
+function stripTrailingRule(source: string): string {
+  return source.replace(/\n---\s*$/, '').trim();
+}
+
 function displayName(slug: string): string {
   return slug.replace(/[-_]/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
@@ -65,9 +80,9 @@ function parseExercises(source: string): Exercise[] {
   return chunks.map((chunk) => {
     const match = chunk.match(/(?:^|\n)(?:### Answer\s*\n|Answer:\s*)([\s\S]*)/i);
     const question = match ? chunk.slice(0, match.index! + (chunk[match.index!] === '\n' ? 1 : 0)) : chunk;
-    const answer = match?.[1]?.trim() ?? '';
+    const answer = match ? stripTrailingRule(match[1]) : '';
     const title = question.match(/^###? (.+)$/m)?.[1] ?? 'Practice';
-    return { title, questionHtml: renderMarkdown(question), answerHtml: renderMarkdown(answer) };
+    return { title, questionHtml: renderMarkdown(stripTrailingRule(question)), answerHtml: renderMarkdown(answer) };
   }).filter((item) => item.questionHtml);
 }
 
@@ -77,7 +92,7 @@ function parseFlashcards(source: string): Flashcard[] {
     .map((card) => {
       const front = card.match(/(?:^|\n)(?:### Front|Front:)\s*\n([\s\S]*?)(?=(?:\n)(?:### Back|Back:)\s*\n|$)/i);
       const back = card.match(/(?:^|\n)(?:### Back|Back:)\s*\n([\s\S]*)/i);
-      return { frontHtml: renderMarkdown(front?.[1] ?? ''), backHtml: renderMarkdown((back?.[1] ?? '').replace(/\n---\s*$/, '')) };
+      return { frontHtml: renderMarkdown(stripTrailingRule(front?.[1] ?? '')), backHtml: renderMarkdown(stripTrailingRule(back?.[1] ?? '')) };
     })
     .filter((card) => card.frontHtml && card.backHtml);
 }
@@ -115,7 +130,7 @@ export function getSubjects(): Subject[] {
     .map((entry) => {
       const path = join(subjectsRoot, entry.name);
       const rawMetadata = readOptional(join(path, 'subject.json'));
-      const metadata = rawMetadata ? JSON.parse(rawMetadata) : {};
+      const metadata = parseSubjectMetadata(rawMetadata);
       return {
         slug: entry.name,
         name: typeof metadata.name === 'string' ? metadata.name : displayName(entry.name),

@@ -164,3 +164,71 @@ Run `~/study-platform/scripts/install-up.sh` in a normal user terminal. The inst
 - `npm run build` — passed; 4 static pages generated.
 - Mocked function checks passed for request schema, both language outputs, trimmed values, missing language, empty key points, and request validation.
 - Inspected built lesson HTML for both language panels and the unchanged Generate Practice feature. Live Gemini and deployed Netlify calls were not run here.
+
+# Phase 7.1 — Bug Fixes, Feature Modules, Study Dashboard, and AI Protection
+
+## Bugs fixed
+
+1. **Exercise answers rendered a stray `<hr>`.** The exercise parser kept the `---` separator at the edge of an answer chunk, so answers like "A" rendered as "A" plus a horizontal rule. A `stripTrailingRule` helper now removes the trailing thematic break from answer, question, and flashcard chunks; the Boolean Algebra lesson previously showed 3 stray `<hr>` elements and now shows 0.
+2. **A malformed `subject.json` crashed the whole build.** `getSubjects()` called `JSON.parse` without error handling, so one syntax error in any subject metadata file broke every page. Metadata parsing now falls back to defaults on invalid JSON; a deliberately broken `calculus/subject.json` was tested and the build completed.
+3. **The AI exercise prompt carried code indentation.** The Gemini prompt was a template literal indented to match the surrounding JavaScript, sending lines padded with many spaces. The prompt is now built from an array of lines joined with `\n`.
+
+## Structure: one feature, one file
+
+All inline client scripts were extracted into `website/src/scripts/`, one module per feature, imported by the pages that use them:
+
+- `theme.ts` — light/dark switch (was inline in BaseLayout).
+- `search.ts` — search dialog and Ctrl/⌘ K shortcut (was inline in BaseLayout).
+- `continue-learning.ts` — Continue Learning card (was inline in index).
+- `reading-progress.ts` — saved scroll position (was inline in lesson page).
+- `exercise-reveal.ts` — answer disclosure buttons (was inline in lesson page).
+- `flashcard-flip.ts` — card flip interaction (was inline in lesson page).
+- `ai-summary.ts` — AI Summary button and rendering (was inline in lesson page).
+- `ai-exercise.ts` — Generate Practice button and rendering (was inline in lesson page).
+- `lesson-tracker.ts` (new) — records daily activity, visited lessons, and the last opened lesson.
+- `study-dashboard.ts` (new) — renders the home dashboard from tracker records.
+- `srs-recorder.ts` (new) — Leitner spaced repetition for flashcards.
+
+Each module ends with `export {}` so TypeScript treats files as independent modules (fixes "cannot redeclare" collisions such as `status` clashing with `window.status`). Behavior is unchanged for existing features.
+
+## New features
+
+### Study dashboard (home page)
+
+A new "Study dashboard" section under Continue learning shows:
+
+- **Streak** — consecutive days with at least one lesson visit (today without a visit does not break the chain).
+- **Lessons opened** — total distinct lessons visited.
+- **Activity heat** — a 5-week GitHub-style grid, one square per day, with tooltips.
+- **Subject progress** — read/total lessons per subject with mini progress bars.
+- **Reviews due today** — count plus links to lessons with flashcards scheduled by the SRS.
+
+All data comes from localStorage (`study-activity`, `study-visited`, `study-srs:*`) written by `lesson-tracker.ts` and `srs-recorder.ts`; nothing leaves the browser. Subject/lesson labels are embedded as hidden data attributes rendered at build time.
+
+### Spaced repetition (Leitner boxes) for flashcards
+
+- Each flashcard back now shows **Again / Good / Easy** grade buttons. "Again" resets to box 1 (due tomorrow), "Good" moves up one box, "Easy" jumps two boxes.
+- Box intervals: 0, 1, 3, 7, 16, 35 days. Cards show their current box as a small badge.
+- Review state is stored per lesson in localStorage and surfaced on the dashboard as "Reviews due today".
+
+### AI function protection and caching (Netlify Functions)
+
+- `netlify/functions/_ai-guard.js` (new) — shared origin allow-list (production domain, localhost, Netlify deploy previews) plus a per-visitor fixed-window rate limit of 10 requests/minute, returning 403/429 with friendly errors.
+- `netlify/functions/_ai-cache.js` (new) — caches finished Gemini responses in Netlify Blobs (`ai-cache` store) keyed by a SHA-256 hash of the lesson content, with a 7-day TTL. Repeat requests return `"cached": true` and consume no Gemini quota; Blob failures never block generation.
+- `ai-summary.js` and `ai-exercise.js` now run the guard and cache first and stay thin; their prompts and validation logic are unchanged otherwise. `@netlify/blobs` was added to `website/package.json` dependencies.
+
+### `new-lesson` command (content scaffolding)
+
+- `scripts/new-lesson` (new, executable) — `new-lesson <subject> <lesson-name> [title]` creates `subjects/<subject>/lessons/<lesson-name>/` from the TEMPLATE lesson, rewriting frontmatter title/date/subject. Guards: repo must exist at `~/study-platform`, subject must exist, lesson must not already exist.
+- `scripts/install-up.sh` now also installs `new-lesson` into `~/.local/bin` alongside `up`.
+
+## Verification
+
+- `node --check` passed for all four Netlify function files.
+- `bash -n` passed for `scripts/new-lesson` and `scripts/install-up.sh`.
+- `npm run check` — 0 errors, 0 warnings, 0 hints across 26 files (was 18 errors before module isolation fix).
+- `npm run build` — passed; 4 static pages generated.
+- Built HTML checks: 0 stray `<hr>` in the Boolean Algebra lesson (was 3); dashboard nodes (`dash-streak`, `dash-visited`, `dash-due-count`, `dash-heat`, `dash-progress`, `dash-due`) present in `index.html`; hidden per-subject data attributes rendered with correct URL lists; SRS grade buttons and dashboard CSS present in the generated bundles.
+- Malformed `subject.json` test: build completed with broken JSON, then restored.
+- `new-lesson` end-to-end test in a temporary HOME: scaffold created with correct frontmatter; duplicate lesson and unknown subject correctly rejected with exit code 1.
+- Live Gemini calls and deployed Netlify Function behavior remain unverified in this environment (no API key or deployment here). Netlify Blobs requires a live Netlify runtime; locally the cache helpers fail soft by design.

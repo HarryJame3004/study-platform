@@ -17,7 +17,7 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
 });
 ---
 <BaseLayout title={`${lesson.title} | ${subject.name}`} description={`Learn ${lesson.title} in ${subject.name}. Read the lesson and practice with exercises and flashcards.`} type="article">
-  <div class="inner-page lesson-page page-enter">
+  <div class="inner-page lesson-page page-enter" data-lesson-url={lesson.url} data-lesson-title={lesson.title} data-lesson-subject={subject.name}>
     <nav class="breadcrumbs" aria-label="Breadcrumb">
       <a href="/">Home</a><span>›</span><a href={`/subjects/${subject.slug}/`}>{subject.name}</a><span>›</span><span>{lesson.title}</span>
     </nav>
@@ -102,170 +102,14 @@ const sections = lesson.html.split(/(?=<h1>)/).filter((part: string) => part.tri
       </div>)}</div>
     </section>}
     <a class="back-link" href={`/subjects/${subject.slug}/`}>← Back to {subject.name}</a>
-  </div>
-  <script define:vars={{ url: lesson.url, title: lesson.title, subjectName: subject.name }}>
-    try { localStorage.setItem('study-last-lesson', JSON.stringify({ url, title, subject: subjectName })); } catch {}
-    let scheduled = false;
-    const saveProgress = () => {
-      scheduled = false;
-      const total = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = total <= 0 ? 100 : Math.round(Math.min(100, window.scrollY / total * 100));
-      try { localStorage.setItem(`study-progress:${url}`, String(progress)); } catch {}
-    };
-    window.addEventListener('scroll', () => { if (!scheduled) { scheduled = true; requestAnimationFrame(saveProgress); } }, { passive: true });
-    document.querySelectorAll('.answer-disclosure').forEach((disclosure) => {
-      const button = disclosure.querySelector('.answer-button');
-      const panel = disclosure.querySelector('.answer-reveal');
-      button.addEventListener('click', () => {
-        const open = !disclosure.classList.contains('is-open');
-        disclosure.classList.toggle('is-open', open);
-        button.setAttribute('aria-expanded', String(open));
-        button.querySelector('span').textContent = open ? 'Hide answer' : 'Show answer';
-        panel.setAttribute('aria-hidden', String(!open));
-        panel.inert = !open;
-      });
-    });
-    document.querySelectorAll('.flashcard').forEach((card) => {
-      const flip = () => {
-        const flipped = card.dataset.flipped !== 'true';
-        card.dataset.flipped = String(flipped);
-        card.setAttribute('aria-pressed', String(flipped));
-        card.setAttribute('aria-label', `Card ${[...card.parentElement.children].indexOf(card) + 1}: show ${flipped ? 'question' : 'answer'}`);
-        card.querySelector('.flashcard-front').setAttribute('aria-hidden', String(flipped));
-        card.querySelector('.flashcard-back').setAttribute('aria-hidden', String(!flipped));
-      };
-      card.addEventListener('click', flip);
-      card.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flip(); } });
-    });
-  </script>
-  <script>
-    const summaryButton = document.querySelector<HTMLButtonElement>('#ai-summary-button');
-    const summaryCard = document.querySelector<HTMLElement>('#ai-summary-card');
-    const summaryStatus = document.querySelector<HTMLElement>('#ai-summary-status');
-    const summaryResult = document.querySelector<HTMLElement>('#ai-summary-result');
-
-    type SummarySection = { summary: string; keyPoints: string[]; importantConcepts: string[] };
-    function validSummary(value: unknown): value is SummarySection {
-      if (!value || typeof value !== 'object') return false;
-      const section = value as Partial<SummarySection>;
-      return typeof section.summary === 'string' && !!section.summary.trim() &&
-        Array.isArray(section.keyPoints) && section.keyPoints.every((item) => typeof item === 'string') &&
-        Array.isArray(section.importantConcepts) && section.importantConcepts.every((item) => typeof item === 'string');
-    }
-
-    function showItems(list: HTMLUListElement, items: string[]) {
-      list.replaceChildren(...items.map((item) => {
-        const row = document.createElement('li');
-        row.textContent = item;
-        return row;
-      }));
-    }
-
-    function renderSummary(section: SummarySection, language: 'vi' | 'en'): boolean {
-      const text = document.querySelector<HTMLElement>(`#ai-summary-${language}-text`);
-      const points = document.querySelector<HTMLUListElement>(`#ai-summary-${language}-points`);
-      const concepts = document.querySelector<HTMLUListElement>(`#ai-summary-${language}-concepts`);
-      if (!text || !points || !concepts) return false;
-      text.textContent = section.summary;
-      showItems(points, section.keyPoints);
-      showItems(concepts, section.importantConcepts);
-      return true;
-    }
-
-    summaryButton?.addEventListener('click', async () => {
-      if (!summaryCard || !summaryStatus || !summaryResult) return;
-      const content = [...document.querySelectorAll<HTMLElement>('#lesson-content .prose')]
-        .map((section) => section.innerText.trim()).filter(Boolean).join('\n\n');
-      summaryCard.hidden = false;
-      summaryButton.setAttribute('aria-expanded', 'true');
-      summaryButton.disabled = true;
-      summaryButton.textContent = 'Generating…';
-      summaryResult.hidden = true;
-      summaryStatus.hidden = false;
-      summaryStatus.textContent = 'Creating your lesson summary…';
-
-      try {
-        const response = await fetch('/.netlify/functions/ai-summary', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data?.error || 'Could not create a summary. Please try again.');
-        if (!validSummary(data?.vietnamese) || !validSummary(data?.english) ||
-            !renderSummary(data.vietnamese, 'vi') || !renderSummary(data.english, 'en')) {
-          throw new Error('The summary response was incomplete. Please try again.');
-        }
-        summaryResult.hidden = false;
-        summaryStatus.hidden = true;
-      } catch (error) {
-        summaryStatus.textContent = error instanceof Error ? error.message : 'Could not create a summary. Please try again.';
-      } finally {
-        summaryButton.disabled = false;
-        summaryButton.textContent = '✨ AI Summary';
-      }
-    });
-  </script>
-  <script>
-    const exerciseButton = document.querySelector<HTMLButtonElement>('#ai-exercise-button');
-    const exerciseStatus = document.querySelector<HTMLElement>('#ai-exercise-status');
-    const exerciseResult = document.querySelector<HTMLElement>('#ai-exercise-result');
-
-    exerciseButton?.addEventListener('click', async () => {
-      if (!exerciseStatus || !exerciseResult) return;
-      const content = [...document.querySelectorAll<HTMLElement>('#lesson-content .prose')]
-        .map((section) => section.innerText.trim()).filter(Boolean).join('\n\n');
-      exerciseButton.disabled = true;
-      exerciseButton.textContent = 'Generating…';
-      exerciseButton.setAttribute('aria-expanded', 'true');
-      exerciseResult.hidden = true;
-      exerciseStatus.hidden = false;
-      exerciseStatus.textContent = 'Creating practice exercises…';
-
-      try {
-        const response = await fetch('/.netlify/functions/ai-exercise', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Could not generate practice. Please try again.');
-        if (!Array.isArray(data.exercises) || !data.exercises.length ||
-            !data.exercises.every((item: { question?: unknown; answer?: unknown; explanation?: unknown }) =>
-              typeof item?.question === 'string' && typeof item.answer === 'string' && typeof item.explanation === 'string')) {
-          throw new Error('The practice response was incomplete. Please try again.');
-        }
-
-        const cards = data.exercises.map((exercise: { question: string; answer: string; explanation: string }, index: number) => {
-          const card = document.createElement('article');
-          card.className = 'ai-exercise-card';
-          const number = document.createElement('span');
-          number.className = 'section-kicker';
-          number.textContent = `QUESTION ${String(index + 1).padStart(2, '0')}`;
-          const question = document.createElement('h3');
-          question.textContent = exercise.question;
-          const details = document.createElement('details');
-          const reveal = document.createElement('summary');
-          reveal.textContent = 'Show answer';
-          const answer = document.createElement('p');
-          const label = document.createElement('strong');
-          label.textContent = 'Answer: ';
-          answer.append(label, document.createTextNode(exercise.answer));
-          const explanation = document.createElement('p');
-          explanation.textContent = exercise.explanation;
-          details.append(reveal, answer, explanation);
-          card.append(number, question, details);
-          return card;
-        });
-        exerciseResult.replaceChildren(...cards);
-        exerciseResult.hidden = false;
-        exerciseStatus.hidden = true;
-      } catch (error) {
-        exerciseStatus.textContent = error instanceof Error ? error.message : 'Could not generate practice. Please try again.';
-      } finally {
-        exerciseButton.disabled = false;
-        exerciseButton.textContent = '📝 Generate Practice';
-      }
-    });
+  </div>  <script>
+    // Feature modules — one file per feature in src/scripts/.
+    import '../../../../scripts/reading-progress.ts';
+    import '../../../../scripts/lesson-tracker.ts';
+    import '../../../../scripts/exercise-reveal.ts';
+    import '../../../../scripts/flashcard-flip.ts';
+    import '../../../../scripts/srs-recorder.ts';
+    import '../../../../scripts/ai-summary.ts';
+    import '../../../../scripts/ai-exercise.ts';
   </script>
 </BaseLayout>

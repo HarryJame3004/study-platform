@@ -23,24 +23,29 @@ const firstLesson = recent[0];
       </a> : <div class="empty-state">Your next lesson will appear here when you add one to a subject.</div>}
     </section>
 
+    <section class="study-dashboard" aria-labelledby="dashboard-heading"><div class="section-heading"><div><span class="section-kicker">YOUR MOMENTUM</span><h2 id="dashboard-heading">Study dashboard</h2></div><span class="section-assist">Progress you can see</span></div>
+      <div class="dash-grid">
+        <div class="dash-card dash-stats">
+          <div class="dash-stat"><span class="dash-stat-value" id="dash-streak">0</span><span class="dash-stat-label">day streak</span></div>
+          <div class="dash-stat"><span class="dash-stat-value" id="dash-visited">0</span><span class="dash-stat-label">lessons opened</span></div>
+          <div class="dash-stat"><span class="dash-stat-value"><span id="dash-due-count">0</span></span><span class="dash-stat-label">cards due today</span></div>
+        </div>
+        <div class="dash-card"><span class="section-kicker">LAST 5 WEEKS</span><div class="dash-heat" id="dash-heat"></div><p class="dash-hint">Each square is a day you opened a lesson.</p></div>
+        <div class="dash-card"><span class="section-kicker">SUBJECT PROGRESS</span><ul class="dash-progress" id="dash-progress"></ul></div>
+        <div class="dash-card"><span class="section-kicker">REVIEWS DUE TODAY</span><ul class="dash-due" id="dash-due"></ul></div>
+      </div>
+      <div class="dash-subject-data" aria-hidden="true">
+        {subjects.map((subject) => <span data-dash-subject={subject.name} data-dash-total={String(subject.lessons.length)} data-dash-urls={subject.lessons.map((lesson) => lesson.url).join('|')} />)}
+        {subjects.flatMap((subject) => subject.lessons.map((lesson) => <span data-dash-lesson={lesson.url} data-dash-lesson-title={lesson.title} />))}
+      </div>
+    </section>
+
     <section id="subjects" class="subjects-section" aria-labelledby="subjects-heading"><div class="section-heading"><div><span class="section-kicker">EXPLORE YOUR LIBRARY</span><h2 id="subjects-heading">Subjects</h2></div><span class="section-count">{String(subjects.length).padStart(2, '0')} subjects</span></div><div class="subject-grid">{subjects.map((subject, index) => <SubjectCard subject={subject} index={index} />)}</div></section>
 
     <section class="recent-section" aria-labelledby="recent-heading"><div class="section-heading"><div><span class="section-kicker">FRESH PAGES</span><h2 id="recent-heading">Recent lessons</h2></div><span class="section-assist">Keep your momentum</span></div>{recent.length ? <div class="recent-list">{recent.map((lesson, index) => <a class="recent-row" href={lesson.url}><span class="recent-index">{String(index + 1).padStart(2, '0')}</span><span class="recent-main"><strong>{lesson.title}</strong><small>{lesson.subjectName}</small></span><span class="recent-date">{lesson.date || 'Undated'}</span><span class="recent-arrow" aria-hidden="true">↗</span></a>)}</div> : <div class="empty-state">Add a lesson to a subject to see it here.</div>}</section>
   </div>
   <script>
-    try {
-      const raw = localStorage.getItem('study-last-lesson');
-      const last = raw && JSON.parse(raw);
-      const card = document.querySelector<HTMLAnchorElement>('#continue-card');
-      if (card && last?.url && last?.title && last?.subject) {
-        card.href = last.url;
-        document.querySelector('#continue-subject')!.textContent = last.subject;
-        document.querySelector('#continue-title')!.textContent = last.title;
-        document.querySelector('#continue-caption')!.textContent = 'Reading progress';
-        const progress = Math.max(0, Math.min(100, Number(localStorage.getItem(`study-progress:${last.url}`)) || 0));
-        document.querySelector('#continue-percent')!.textContent = `${progress}%`;
-        (document.querySelector('#continue-progress') as HTMLElement).style.width = `${progress}%`;
-      }
-    } catch {}
+    import '../scripts/continue-learning.ts';
+    import '../scripts/study-dashboard.ts';
   </script>
 </BaseLayout>
