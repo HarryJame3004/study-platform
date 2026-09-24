@@ -27,6 +27,14 @@ Create `subjects/<subject-slug>/` at the repository root. A subject appears on t
 
 `color` may be `blue`, `green`, `purple`, `orange`, or `red`; unknown values use blue. The directory name becomes the URL slug. Empty placeholder folders, metadata-only subjects, and subjects without a usable lesson are omitted from pages and the sitemap. A new build discovers eligible subjects automatically.
 
+`scripts/import-law-kit.mjs` (repository root) regenerates the Law & Data Protection lessons from the standalone single-file study kit:
+
+```sh
+node scripts/import-law-kit.mjs /path/to/law-data-protection-study-kit.html
+```
+
+It converts the kit's chapter notes to `lesson.md` (boxes become blockquotes, tables become pipe tables), its flashcard array to `flashcards.md`, and its multiple-choice bank to `exercises.md` with the correct answer letter and explanation in the answer line. Rerunning overwrites the generated lessons, so edit those files directly only after the final import.
+
 ## Add a lesson
 
 Create `subjects/<subject-slug>/lessons/<lesson-slug>/lesson.md`:
@@ -103,7 +111,7 @@ Browser features live as one file per feature in `website/src/scripts/`, importe
 | `study-dashboard.ts` | Home dashboard: streak, activity heat, subject progress, due reviews |
 | `exercise-reveal.ts` | Exercise answer disclosure |
 | `flashcard-flip.ts` | Flashcard flip interaction |
-| `srs-recorder.ts` | Leitner spaced repetition schedule for flashcards |
+| `srs-recorder.ts` | Leitner spaced repetition schedule for flashcards (Again / Hard / Good / Easy) |
 | `ai-summary.ts` | AI Summary button and card |
 | `ai-exercise.ts` | Generate Practice button and cards |
 

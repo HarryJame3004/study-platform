@@ -232,3 +232,24 @@ All data comes from localStorage (`study-activity`, `study-visited`, `study-srs:
 - Malformed `subject.json` test: build completed with broken JSON, then restored.
 - `new-lesson` end-to-end test in a temporary HOME: scaffold created with correct frontmatter; duplicate lesson and unknown subject correctly rejected with exit code 1.
 - Live Gemini calls and deployed Netlify Function behavior remain unverified in this environment (no API key or deployment here). Netlify Blobs requires a live Netlify runtime; locally the cache helpers fail soft by design.
+
+# Phase 8.1 — Law & Data Protection Study Kit Import
+
+## Changes
+
+- Added `scripts/import-law-kit.mjs` (repository root), a one-off importer that converts the standalone `law-data-protection-study-kit.html` into website content: 9 lessons under `subjects/law-and-data-protection/lessons/` — 1 "How to Use This Study Kit" intro (study loop, exam strategy, what's inside) plus the 8 course chapters (Basics of law, Personal data, GDPR principles, Data subject rights, Special categories & Art. 10, Remedies and fines, DPIA, International transfers).
+- Chapter notes keep the kit's structure: sealed article references (`Art. 5`, `5(1)(a)`) become inline code, boxes become labeled blockquotes (🧠 Memory hook, ⚠️ Exam trap, ⚖️ Case, 📚 Beyond the slides), comparison tables become Markdown pipe tables, and the one-line opener becomes a highlighted callout.
+- The kit's 153 flashcards became per-chapter `flashcards.md` decks (18/14/33/25/12/17/14/20 cards) and its 97-question multiple-choice bank became per-chapter `exercises.md` (A–D options with the correct letter, the correct option, and the explanation in the answer line).
+- Fixed Markdown typographer artifacts during conversion: `(c)` no longer renders as © (lawful bases, quiz options, and flashcards), and code seals are not escaped inside headings.
+- Upgraded the site-wide Leitner flashcard grading with a **Hard** button (`srs-recorder.ts`): Again resets to box 1, Hard keeps the current box, Good moves up one, Easy jumps two — matching the study kit's SM-2-style four-button rating. Added hover styling for the Hard button; box behavior for existing grades is unchanged.
+- Updated `subjects/law-and-data-protection/subject.json` description (153 flashcards, 97 MCQs) and `website/README.md` (importer usage note, Hard button in the module table).
+- The kit's 19 written-practice questions and 16 Feynman prompts remain in the original HTML file; the AI Summary and Generate Practice buttons cover similar ground on lesson pages.
+
+## Verification
+
+- Dry-run parses exactly 8 chapters, 153 cards, 97 quiz questions across all 8 chapters; no residual HTML tags in any generated `lesson.md`; no literal © symbols in built pages where the kit wrote "(c)".
+- `npm run check` — 0 errors, 0 warnings, 0 hints.
+- `npm run build` — 16 pages (was 11): home + 3 subjects + 12 lessons including all 9 law lessons.
+- Built HTML checks: ch3 shows 33 flashcards and 18 exercises; memory hooks, exam traps, case blockquotes, and pipe tables render; `(c) Legal obligation` and `(c) legal obligation` render correctly.
+- The Hard grade button and its aria-label are present in the built JS bundle; browser DOM checks for SRS grading on this page were not possible here (the single-file preview does not load the module bundle, and background dev servers are killed between shell commands in this sandbox). Grade-button behavior follows the same code path verified for Again/Good/Easy, differing only in the box calculation.
+- Visual screenshot remains unverified in this environment (headless renderer cannot composite frames, as noted in Phase 2.2); the accessibility-tree snapshot of the ch3 lesson confirmed structure and content.

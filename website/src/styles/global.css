@@ -429,6 +429,7 @@ h1, h2, h3, p { margin-top: 0; }
 .srs-grade { padding: 6px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink-soft); font-size: 10px; font-weight: 750; transition: background .2s, color .2s, border-color .2s; }
 .srs-grade:hover { border-color: var(--accent); }
 .srs-again:hover { background: #faeaf0; color: #bc7e8e; }
+.srs-hard:hover { background: #f7f0dd; color: #9a7c33; }
 .srs-good:hover { background: var(--accent-soft); color: var(--accent-deep); }
 .srs-easy:hover { background: #e4f3ed; color: #609a85; }
 .flashcard[data-srs] .flashcard-front::after { content: "Box " attr(data-srs); display: inline-block; margin-top: 8px; padding: 2px 7px; border-radius: 99px; background: var(--accent-soft); color: var(--accent-deep); font-size: 9px; font-weight: 800; letter-spacing: .1em; }

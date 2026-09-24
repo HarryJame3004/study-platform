@@ -18,12 +18,13 @@ function save(states: CardState[]) {
   try { localStorage.setItem(`study-srs:${url}`, JSON.stringify(states)); } catch {}
 }
 
-function record(id: number, grade: 'again' | 'good' | 'easy') {
+function record(id: number, grade: 'again' | 'hard' | 'good' | 'easy') {
   if (!url) return;
   const states = load();
   const existing = states.find((state) => state.id === id);
   const box = existing?.box ?? 1;
-  const nextBox = grade === 'again' ? 1 : Math.min(BOX_INTERVALS_DAYS.length - 1, box + (grade === 'easy' ? 2 : 1));
+  // Again resets to box 1; Hard stays in the same box; Good moves up one; Easy jumps two.
+  const nextBox = grade === 'again' ? 1 : grade === 'hard' ? Math.max(1, box) : Math.min(BOX_INTERVALS_DAYS.length - 1, box + (grade === 'easy' ? 2 : 1));
   const due = Date.now() + BOX_INTERVALS_DAYS[nextBox] * DAY_MS;
   const next: CardState = { id, box: nextBox, due };
   save([...states.filter((state) => state.id !== id), next]);
@@ -39,6 +40,12 @@ function gradeRow(id: number): HTMLElement {
   again.textContent = 'Again';
   again.setAttribute('aria-label', `Card ${id + 1}: review again tomorrow`);
   again.addEventListener('click', (event) => { event.stopPropagation(); record(id, 'again'); });
+  const hard = document.createElement('button');
+  hard.type = 'button';
+  hard.className = 'srs-grade srs-hard';
+  hard.textContent = 'Hard';
+  hard.setAttribute('aria-label', `Card ${id + 1}: struggled, keep the current box`);
+  hard.addEventListener('click', (event) => { event.stopPropagation(); record(id, 'hard'); });
   const good = document.createElement('button');
   good.type = 'button';
   good.className = 'srs-grade srs-good';
@@ -51,7 +58,7 @@ function gradeRow(id: number): HTMLElement {
   easy.textContent = 'Easy';
   easy.setAttribute('aria-label', `Card ${id + 1}: easy, postpone the next review`);
   easy.addEventListener('click', (event) => { event.stopPropagation(); record(id, 'easy'); });
-  row.append(again, good, easy);
+  row.append(again, hard, good, easy);
   return row;
 }
 
